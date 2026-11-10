@@ -55,6 +55,8 @@ const UPSTREAM = {
 export default {
   async fetch(request, env, ctx) {
     if (request.method !== 'GET') return json({ error: 'method' }, 405);
+    // Without the secret every upstream answer is a key error; say so instead.
+    if (!env.DATA_GO_KR_KEY) return json({ error: 'key not configured' }, 500);
     const url = new URL(request.url);
     const ip = request.headers.get('cf-connecting-ip') ?? 'unknown';
     if (env.PER_IP) {
