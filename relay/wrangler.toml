@@ -1,0 +1,25 @@
+# 버스온다 relay: hides the data.go.kr key, caches bus answers and keeps the
+# key under its daily quota.
+name = "busonda-relay"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+
+[[durable_objects.bindings]]
+name = "COUNTER"
+class_name = "DailyCounter"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DailyCounter"]
+
+# Per-IP limit so one client cannot burn the shared API quotas.
+[[ratelimits]]
+name = "PER_IP"
+namespace_id = "2001"
+simple = { limit = 60, period = 60 }
+
+[vars]
+# Per upstream service per day, counted on cache misses only. Set just below
+# the 트래픽 shown on each data.go.kr 활용신청 page (development accounts).
+TAGO_DAILY_CAP = "9000"
+SEOUL_DAILY_CAP = "900"
