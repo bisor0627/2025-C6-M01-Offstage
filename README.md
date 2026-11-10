@@ -9,6 +9,12 @@
 [![Xcode](https://img.shields.io/badge/Xcode-15.0-blue.svg)]()
 [![License](https://img.shields.io/badge/license-MIT-green.svg)]() -->
 
+## 🔧 유지 안내
+
+이 저장소는 [DeveloperAcademy-POSTECH/2025-C6-M01-Offstage](https://github.com/DeveloperAcademy-POSTECH/2025-C6-M01-Offstage)(아카데미 기간 팀 프로젝트, 2025.09–11)의 fork로, 출시된 앱 **버스온다**를 [Kirby](https://github.com/bisor0627)가 이어서 유지합니다. 원본 저장소는 아카데미 기록으로 그대로 둡니다.
+
+- 버스 API 키는 앱에 포함하지 않고 [`relay/`](relay/) (Cloudflare Worker)에서 붙입니다. 로컬 빌드에 `Secrets.xcconfig`가 더 이상 필요하지 않습니다.
+
 ## 📱 소개
 
 우리는 **시각적 어려움을 가진 사람이 버스를 탈 때 겪는 불편함**을 해소하는 것을 목표로 합니다.  

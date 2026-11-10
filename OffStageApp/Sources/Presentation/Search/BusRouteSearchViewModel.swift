@@ -89,7 +89,7 @@ final class BusRouteSearchViewModel: ObservableObject {
             filterBusRoutes()
         } catch {
             print("Error fetching bus routes: \(error)")
-            errorMessage = error.localizedDescription
+            errorMessage = error.busLoadMessage
             allBusRoutes = []
             busRoutes = []
         }

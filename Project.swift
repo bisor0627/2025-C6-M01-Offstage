@@ -9,7 +9,7 @@ let baseInfoPlist: [String: Plist.Value] = [
         "UIImageName": "",
     ],
     "CFBundleShortVersionString": "1.0.4",
-    "CFBundleVersion": "3",
+    "CFBundleVersion": "4",
     "NSLocationWhenInUseUsageDescription": "현재 위치를 기반으로 주변 정류장 정보를 제공하기 위해 위치 정보가 필요합니다.",
     "NSLocationAlwaysAndWhenInUseUsageDescription": "백그라운드에서도 위치를 수집하여 앱을 열었을 때 빠르게 근처 정류장 정보를 제공합니다.",
     "NSLocationAlwaysUsageDescription": "백그라운드에서도 위치를 수집하여 앱을 열었을 때 빠르게 근처 정류장 정보를 제공합니다.",

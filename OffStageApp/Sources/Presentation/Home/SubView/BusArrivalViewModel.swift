@@ -121,10 +121,7 @@ final class BusArrivalViewModel: ObservableObject {
             stopCountdownTimer()
             hasVibratedAtSecondStop = false
         case let .error(error):
-            errorMessage = String(
-                format: String(localized: "bus.arrival.error.loadFailed"),
-                error.localizedDescription
-            )
+            errorMessage = error.busLoadMessage
             currentEstimatedArrivalTime = nil
             stopCountdownTimer()
             hasVibratedAtSecondStop = false

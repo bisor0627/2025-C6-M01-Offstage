@@ -106,7 +106,7 @@ final class BusStopSelectionViewModel: ObservableObject {
 
             } catch {
                 print("Error fetching nearby stops: \(error)")
-                errorMessage = "근처 정류장을 불러오는데 실패했습니다."
+                errorMessage = error.busLoadMessage
                 nearbyStops = []
             }
         }
