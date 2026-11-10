@@ -5,24 +5,14 @@ import Moya
 public final class TagoBusRepository: BusRepository {
     private let provider: MoyaProvider<BusAPITarget>
     private let decoder: JSONDecoder
-    private let keyProvider: (BusAPIService) throws -> String
     private let logger = Logger(label: "BusAPI.TagoBusRepository")
 
     public init(
         provider: MoyaProvider<BusAPITarget>? = nil,
-        decoder: JSONDecoder = JSONDecoder(),
-        keyProvider: @escaping (BusAPIService) throws -> String = { try BusAPIKey.value(for: $0) }
+        decoder: JSONDecoder = JSONDecoder()
     ) {
-        if let provider {
-            self.provider = provider
-        } else {
-            let plugins: [PluginType] = [
-                ServiceKeyPlugin(),
-            ]
-            self.provider = MoyaProvider<BusAPITarget>(plugins: plugins)
-        }
+        self.provider = provider ?? MoyaProvider<BusAPITarget>()
         self.decoder = decoder
-        self.keyProvider = keyProvider
     }
 
     public func fetchCities(for service: BusAPIService) async throws -> [BusCity] {
@@ -111,7 +101,7 @@ public final class TagoBusRepository: BusRepository {
     }
 
     private func fetch<Item: Decodable>(endpoint: BusAPITarget.Endpoint) async throws -> BusAPIEnvelope<Item> {
-        let target = try BusAPITarget.make(endpoint, keyProvider: keyProvider)
+        let target = BusAPITarget(endpoint)
 
         let response: Response
         do {
@@ -119,6 +109,10 @@ public final class TagoBusRepository: BusRepository {
             response = try await provider.request(target)
         } catch let error as MoyaError {
             throw BusAPIError.network(error)
+        }
+
+        if let relayError = BusAPIError(relayStatus: response.statusCode) {
+            throw relayError
         }
 
         guard !response.data.isEmpty else {

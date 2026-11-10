@@ -26,6 +26,14 @@ struct HomeView: View {
         }
     }
 
+    private var emptyStopMessage: LocalizedStringKey {
+        switch viewModel.loadFailure {
+        case .dailyLimit: L10n.Home.Map.dailyLimit
+        case .unavailable: L10n.Home.Map.loadFailed
+        case nil: L10n.Home.Map.noStopsFound
+        }
+    }
+
     init() {
         _viewModel = StateObject(wrappedValue: HomeViewModel())
     }
@@ -214,7 +222,7 @@ struct HomeView: View {
         } else {
             VStack(spacing: 10) {
                 HStack {
-                    Text(L10n.Home.Map.noStopsFound)
+                    Text(emptyStopMessage)
                         .font(.headline)
                         .multilineTextAlignment(.leading)
                         .foregroundColor(.white)

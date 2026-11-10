@@ -23,7 +23,8 @@ public enum SeoulBusAPITarget {
 }
 
 extension SeoulBusAPITarget: TargetType {
-    public var baseURL: URL { URL(string: "http://ws.bus.go.kr/api/rest")! }
+    /// 서울 버스 API through the relay, which adds the service key and calls it over http.
+    public var baseURL: URL { BusRelay.baseURL.appendingPathComponent("v1/seoul") }
 
     public var path: String {
         switch self {
@@ -41,9 +42,8 @@ extension SeoulBusAPITarget: TargetType {
     public var method: Moya.Method { .get }
 
     public var task: Task {
-        // 1. serviceKey와 resultType=json은 공통 파라미터입니다.
+        // 1. resultType=json은 공통 파라미터입니다. serviceKey는 relay가 붙입니다.
         var params: [String: Any] = [
-            "serviceKey": BusAPIKey.seoul, // Phase 1에서 추가한 키 로더 사용
             "resultType": "json",
         ]
 

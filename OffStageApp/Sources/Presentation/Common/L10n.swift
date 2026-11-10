@@ -136,6 +136,10 @@ enum L10n {
             static let noStopsFound = key("home.map.noStopsFound")
             /// "주변에 정류장이 없습니다."
             static let noStopsFoundSimple = key("home.map.noStopsFound.simple")
+            /// "버스 정보를 불러오지 못했습니다.\n잠시 후 다시 시도해 주세요."
+            static let loadFailed = key("home.map.loadFailed")
+            /// "오늘은 조회가 많아 버스 정보를\n불러올 수 없습니다. 내일 다시 시도해 주세요."
+            static let dailyLimit = key("home.map.dailyLimit")
         }
 
         enum Sheet {

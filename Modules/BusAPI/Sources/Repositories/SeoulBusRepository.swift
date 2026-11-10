@@ -17,6 +17,15 @@ public final class SeoulBusRepository: BusRepository {
         self.decoder = decoder
     }
 
+    /// Sends a request and turns relay refusals (429/502/503) into `BusAPIError`.
+    private func request(_ target: SeoulBusAPITarget) async throws -> Response {
+        let response = try await provider.request(target)
+        if let relayError = BusAPIError(relayStatus: response.statusCode) {
+            throw relayError
+        }
+        return response
+    }
+
     public func fetchCities(for _: BusAPIService) async throws -> [BusCity] {
         // 서울시는 별도의 도시 목록 API를 사용하지 않음. 빈 배열 반환.
         []
@@ -25,7 +34,7 @@ public final class SeoulBusRepository: BusRepository {
     // MARK: - BusRepository Conformance
 
     public func fetchRouteLocations(cityCode _: String, routeId: String, page _: Int?) async throws -> [BusLocation] {
-        let response = try await provider.request(.getBusPosByRtid(busRouteId: routeId))
+        let response = try await request(.getBusPosByRtid(busRouteId: routeId))
         let body = try decoder.decode(SeoulBusLocationResponse.self, from: response.data)
         return body.msgBody.itemList.compactMap { dto in
             guard let lat = Double(dto.posY), let lon = Double(dto.posX) else { return nil }
@@ -42,7 +51,7 @@ public final class SeoulBusRepository: BusRepository {
     }
 
     public func fetchRouteStations(cityCode _: String, routeId: String) async throws -> [BusRouteStation] {
-        let response = try await provider.request(.getStaionByRoute(busRouteId: routeId))
+        let response = try await request(.getStaionByRoute(busRouteId: routeId))
         let body = try decoder.decode(SeoulRouteStationResponse.self, from: response.data)
 
         return body.msgBody.itemList.compactMap { dto in
@@ -67,19 +76,19 @@ public final class SeoulBusRepository: BusRepository {
             return []
         }
 
-        let response = try await provider.request(.getStationByName(name: searchTerm))
+        let response = try await request(.getStationByName(name: searchTerm))
         let body = try decoder.decode(SeoulKeywordStopResponse.self, from: response.data)
         return body.msgBody.itemList.compactMap { adaptToBusStop(from: $0) }
     }
 
     public func fetchStopsNearby(latitude: Double, longitude: Double, cityCode _: String?) async throws -> [BusStop] {
-        let response = try await provider.request(.getStationByPos(tmX: longitude, tmY: latitude))
+        let response = try await request(.getStationByPos(tmX: longitude, tmY: latitude))
         let body = try decoder.decode(SeoulGpsStopResponse.self, from: response.data)
         return body.msgBody.itemList.compactMap { adaptToBusStop(from: $0) }
     }
 
     public func fetchRoutesPassingThroughStop(cityCode _: String, nodeId: String) async throws -> [BusRoute] {
-        let response = try await provider.request(.getRouteByStation(arsId: nodeId))
+        let response = try await request(.getRouteByStation(arsId: nodeId))
         let body = try decoder.decode(SeoulStationRouteResponse.self, from: response.data)
 
         return body.msgBody.itemList.map { dto in
@@ -91,7 +100,7 @@ public final class SeoulBusRepository: BusRepository {
     }
 
     public func fetchRouteInfo(cityCode _: String, routeId: String) async throws -> BusRoute? {
-        let response = try await provider.request(.getRouteInfo(routeId: routeId))
+        let response = try await request(.getRouteInfo(routeId: routeId))
         let body = try decoder.decode(SeoulRouteInfoResponse.self, from: response.data)
         return body.msgBody.itemList.first.map { dto in
             BusRoute(
@@ -102,7 +111,7 @@ public final class SeoulBusRepository: BusRepository {
     }
 
     public func searchRoutes(cityCode _: String, routeNumber: String) async throws -> [BusRoute] {
-        let response = try await provider.request(.getRouteInfo(routeId: routeNumber))
+        let response = try await request(.getRouteInfo(routeId: routeNumber))
         let body = try decoder.decode(SeoulRouteInfoResponse.self, from: response.data)
         return body.msgBody.itemList.map { dto in
             BusRoute(
@@ -113,7 +122,7 @@ public final class SeoulBusRepository: BusRepository {
     }
 
     public func fetchStopArrivals(cityCode _: String, nodeId: String) async throws -> [BusArrival] {
-        let response = try await provider.request(.getStationArrivals(arsId: nodeId))
+        let response = try await request(.getStationArrivals(arsId: nodeId))
         let body = try decoder.decode(SeoulArrivalResponse.self, from: response.data)
 
         let arrivals = body.msgBody.itemList.flatMap { dto in

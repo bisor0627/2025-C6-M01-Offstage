@@ -9,6 +9,15 @@ final class HomeViewModel: ObservableObject {
     @Published var nearestBusStop: BusStop?
     @Published var busRoutes: [BusRoute] = []
     @Published var isLoading = false
+    /// Set when bus data could not be loaded, as opposed to "no stops nearby".
+    @Published var loadFailure: LoadFailure?
+
+    enum LoadFailure {
+        /// The relay used today's public API quota.
+        case dailyLimit
+        /// Network, relay or public API failure; worth retrying.
+        case unavailable
+    }
 
     private var locationProvider: LocationProviding
     private let busRepository = MainBusRepository()
@@ -28,6 +37,7 @@ final class HomeViewModel: ObservableObject {
     func fetchNearestStop() {
         Task {
             isLoading = true
+            loadFailure = nil
             defer { isLoading = false }
             do {
                 // 먼저 백그라운드에서 저장된 위치를 확인
@@ -58,8 +68,8 @@ final class HomeViewModel: ObservableObject {
                 }
 
             } catch {
-                // TODO: Handle error properly
                 print("Error fetching nearest stop: \(error)")
+                loadFailure = Self.loadFailure(for: error)
                 nearestBusStop = nil
                 busRoutes = []
             }
@@ -79,7 +89,22 @@ final class HomeViewModel: ObservableObject {
             busRoutes = routes
         } catch {
             print("Error fetching bus routes: \(error)")
+            loadFailure = Self.loadFailure(for: error)
             busRoutes = []
+        }
+    }
+
+    /// Bus API errors become a visible failure; location errors keep the
+    /// existing "no stops found" state.
+    private static func loadFailure(for error: Error) -> LoadFailure? {
+        guard let busError = error as? BusAPIError else { return nil }
+        switch busError {
+        case .dailyLimitReached:
+            return .dailyLimit
+        case .noResults:
+            return nil
+        default:
+            return .unavailable
         }
     }
 }

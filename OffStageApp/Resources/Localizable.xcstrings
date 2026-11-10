@@ -1008,6 +1008,40 @@
         }
       }
     },
+    "home.map.dailyLimit" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's bus lookups are used up.\nPlease try again tomorrow."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "오늘은 조회가 많아 버스 정보를\n불러올 수 없습니다. 내일 다시 시도해 주세요."
+          }
+        }
+      }
+    },
+    "home.map.loadFailed" : {
+      "extractionState" : "manual",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Couldn't load bus information.\nPlease try again shortly."
+          }
+        },
+        "ko" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "버스 정보를 불러오지 못했습니다.\n잠시 후 다시 시도해 주세요."
+          }
+        }
+      }
+    },
     "home.map.near" : {
       "extractionState" : "manual",
       "localizations" : {

@@ -3,23 +3,14 @@ import Moya
 
 public struct BusAPITarget: TargetType {
     public let endpoint: Endpoint
-    let serviceKey: String
 
-    public static func make(
-        _ endpoint: Endpoint,
-        keyProvider: (BusAPIService) throws -> String = { try BusAPIKey.value(for: $0) }
-    ) throws -> BusAPITarget {
-        let key = try keyProvider(endpoint.service)
-        return BusAPITarget(endpoint: endpoint, serviceKey: key)
-    }
-
-    private init(endpoint: Endpoint, serviceKey: String) {
+    public init(_ endpoint: Endpoint) {
         self.endpoint = endpoint
-        self.serviceKey = serviceKey
     }
 
+    /// TAGO through the relay, which adds the service key.
     public var baseURL: URL {
-        URL(string: "https://apis.data.go.kr/1613000")!
+        BusRelay.baseURL.appendingPathComponent("v1/tago")
     }
 
     public var path: String {
