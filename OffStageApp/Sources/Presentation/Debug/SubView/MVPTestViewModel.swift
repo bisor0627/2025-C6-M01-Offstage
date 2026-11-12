@@ -171,7 +171,6 @@ final class MVPTestViewModel: ObservableObject {
         routeQuery: String
     ) async -> MVPResult {
         let cityCodeString = String(cityCode)
-        let isSeoul = cityCodeString == "1000"
 
         do {
             // 1. GPS로 정류소 식별
@@ -219,7 +218,7 @@ final class MVPTestViewModel: ObservableObject {
         guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
             throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
         }
-        return CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
+        return CityCodeConverter.isSeoul(placemark) ? CityCodeConverter.seoul : "31020" // Debug: Seongnam outside Seoul
     }
 
     private func describeArrivals(_ arrivals: [BusArrival]) -> String {

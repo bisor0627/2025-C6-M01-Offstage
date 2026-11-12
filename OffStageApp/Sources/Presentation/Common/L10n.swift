@@ -1,8 +1,8 @@
 import SwiftUI
 
-// [주의] 이 파일은 스크립트에 의해 자동 생성되었습니다.
+// 화면 문구 키 모음입니다.
 // L10n(현지화) 및 A11y(접근성) 문자열을 관리합니다.
-// 원본 소스: Scripts/strings.csv
+// 문구 원본은 OffStageApp/Resources/Localizable.xcstrings 입니다. 키를 추가하면 여기에도 직접 추가합니다.
 
 enum L10n {
     private static func key(_ key: String) -> LocalizedStringKey {

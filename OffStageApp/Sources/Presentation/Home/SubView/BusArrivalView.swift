@@ -221,7 +221,7 @@ struct BusArrivalView: View {
                     .foregroundColor(Color(.gray50))
                     .lineLimit(nil)
 
-                let locationName = location.nodeName ?? String(localized: "common.ui.unknownLocation")
+                let locationName = location.nodeName
                 Text(String(
                     format: String(localized: "home.map.near"),
                     locationName

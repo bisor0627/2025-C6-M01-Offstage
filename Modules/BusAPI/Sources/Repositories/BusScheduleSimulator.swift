@@ -68,7 +68,6 @@ enum BusScheduleSimulator {
         let secondsSinceMidnight = currentTime.timeIntervalSince(midnight)
 
         let currentCycle = floor(secondsSinceMidnight / route.interval)
-        let timeSinceLastDeparture = secondsSinceMidnight - (currentCycle * route.interval)
 
         let arrivalTimeThisCycle = currentCycle * route.interval + timeToThisStop
         let arrivalTimeNextCycle = (currentCycle + 1) * route.interval + timeToThisStop

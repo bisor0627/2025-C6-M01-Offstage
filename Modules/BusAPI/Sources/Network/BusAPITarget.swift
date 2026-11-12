@@ -87,7 +87,7 @@ public extension BusAPITarget {
             switch self {
             case .cityCodes:
                 [:]
-            case let .routeLocations(cityCode, routeId, page, rows):
+            case let .routeLocations(cityCode, routeId, page, _):
                 [
                     "cityCode": cityCode,
                     "routeId": routeId,

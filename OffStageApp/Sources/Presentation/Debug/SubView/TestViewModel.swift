@@ -388,7 +388,7 @@ final class TestViewModel: ObservableObject {
             throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
         }
         // CityCodeConverter is in BusAPI module, but it should be fine as it has no external dependencies
-        return CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
+        return CityCodeConverter.isSeoul(placemark) ? CityCodeConverter.seoul : "31020" // Debug: Seongnam outside Seoul
     }
 
     private func describeStops(_ stops: [BusStop]) -> String {

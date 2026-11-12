@@ -21,7 +21,6 @@ import PackageDescription
         productTypes: [
             // (권장) 안정적인 빌드를 위해 동적 프레임워크로 강제
             "Logging": .framework,
-            "GRDB": .framework,
         ],
 
         // 3. (핵심) 모든 SPM 의존성들이
@@ -38,6 +37,5 @@ let package = Package(
     name: "OffStageApp",
     dependencies: [
         .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
-        .package(url: "https://github.com/groue/GRDB.swift.git", from: "6.25.0"),
     ]
 )

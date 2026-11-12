@@ -84,7 +84,6 @@ let app = Target.target(
     scripts: [formatScript, lintScript],
     dependencies: [
         .target(name: "BusAPI"),
-        .external(name: "GRDB"),
     ],
     settings: .settings(configurations: configurations)
 )

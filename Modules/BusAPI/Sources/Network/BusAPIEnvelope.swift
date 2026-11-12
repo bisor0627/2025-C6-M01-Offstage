@@ -120,7 +120,7 @@ private struct Discardable: Decodable {
             return
         }
 
-        if var container = try? decoder.container(keyedBy: AnyCodingKey.self) {
+        if let container = try? decoder.container(keyedBy: AnyCodingKey.self) {
             for key in container.allKeys {
                 _ = try? container.decode(Discardable.self, forKey: key)
             }

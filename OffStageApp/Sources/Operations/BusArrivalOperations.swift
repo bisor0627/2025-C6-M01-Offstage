@@ -85,7 +85,11 @@ final class BusArrivalOperations {
 
     /// BusVisionArrivalAlertManager에서 사용할 수 있도록 public 메서드 제공
     func fetchArrivalsOnly(busStop: BusStop, busRoute: BusRoute) async throws -> [BusArrival] {
-        let cityCode = try await BusCityRouting.code(for: busStop, locationProvider: locationProvider)
+        let cityCode = try await BusCityRouting.code(
+            for: busStop,
+            repository: busRepository,
+            locationProvider: locationProvider
+        )
         return try await busRepository.fetchRouteArrivals(
             cityCode: cityCode,
             nodeId: busStop.nodeId,
@@ -94,7 +98,11 @@ final class BusArrivalOperations {
     }
 
     private func fetchLocations(busStop: BusStop, busRoute: BusRoute) async throws -> [BusLocation] {
-        let cityCode = try await BusCityRouting.code(for: busStop, locationProvider: locationProvider)
+        let cityCode = try await BusCityRouting.code(
+            for: busStop,
+            repository: busRepository,
+            locationProvider: locationProvider
+        )
         return try await busRepository.fetchRouteLocations(
             cityCode: cityCode,
             routeId: busRoute.routeId,

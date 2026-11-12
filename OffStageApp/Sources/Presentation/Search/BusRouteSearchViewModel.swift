@@ -67,7 +67,11 @@ final class BusRouteSearchViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         do {
-            let cityCodeString = try await BusCityRouting.code(for: busStop, locationProvider: LocationManager.shared)
+            let cityCodeString = try await BusCityRouting.code(
+                for: busStop,
+                repository: busRepository,
+                locationProvider: LocationManager.shared
+            )
 
             let routes = try await busRepository.fetchRoutesPassingThroughStop(
                 cityCode: cityCodeString,

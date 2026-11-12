@@ -80,6 +80,7 @@ final class PermissionManager: NSObject, ObservableObject {
     // MARK: - 모든 권한 승인 여부 확인 (재요청 없이 현재 상태만 체크)
 
     @MainActor
+    @discardableResult
     func checkAllPermissionsGranted() async -> Bool {
         deniedPermissions.removeAll()
 
