@@ -85,10 +85,7 @@ final class BusArrivalOperations {
 
     /// BusVisionArrivalAlertManager에서 사용할 수 있도록 public 메서드 제공
     func fetchArrivalsOnly(busStop: BusStop, busRoute: BusRoute) async throws -> [BusArrival] {
-        let cityCode = try await detectCityCode(from: CLLocationCoordinate2D(
-            latitude: busStop.latitude,
-            longitude: busStop.longitude
-        ))
+        let cityCode = try await BusCityRouting.code(for: busStop, locationProvider: locationProvider)
         return try await busRepository.fetchRouteArrivals(
             cityCode: cityCode,
             nodeId: busStop.nodeId,
@@ -97,21 +94,11 @@ final class BusArrivalOperations {
     }
 
     private func fetchLocations(busStop: BusStop, busRoute: BusRoute) async throws -> [BusLocation] {
-        let cityCode = try await detectCityCode(from: CLLocationCoordinate2D(
-            latitude: busStop.latitude,
-            longitude: busStop.longitude
-        ))
+        let cityCode = try await BusCityRouting.code(for: busStop, locationProvider: locationProvider)
         return try await busRepository.fetchRouteLocations(
             cityCode: cityCode,
             routeId: busRoute.routeId,
             page: nil
         )
-    }
-
-    private func detectCityCode(from gps: CLLocationCoordinate2D) async throws -> String {
-        guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
-            throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
-        }
-        return CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
     }
 }

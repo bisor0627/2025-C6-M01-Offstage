@@ -41,13 +41,6 @@ final class BusStopSelectionViewModel: ObservableObject {
 
     // MARK: - Private Methods
 
-    private func detectCityCode(from gps: CLLocationCoordinate2D) async throws -> String {
-        guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
-            throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
-        }
-        return CityCodeConverter.findCode(from: placemark) ?? "31020"
-    }
-
     /// 두 좌표 간의 거리를 계산 (미터 단위)
     private func calculateDistance(
         from userLocation: CLLocationCoordinate2D,
@@ -82,17 +75,14 @@ final class BusStopSelectionViewModel: ObservableObject {
                     longitude: location.longitude
                 )
 
-                // 2. 도시 코드 감지
-                let cityCodeString = try await detectCityCode(from: coordinate)
-
-                // 3. 근처 정류장 가져오기
-                let stops = try await busRepository.fetchStopsNearby(
-                    latitude: coordinate.latitude,
-                    longitude: coordinate.longitude,
-                    cityCode: cityCodeString
+                // 2. 근처 정류장 가져오기 (서울이면 서울 API, 그 외 TAGO)
+                let stops = try await BusCityRouting.nearbyStops(
+                    around: coordinate,
+                    repository: busRepository,
+                    locationProvider: locationProvider
                 )
 
-                // 4. 각 정류장에 대해 거리 계산
+                // 3. 각 정류장에 대해 거리 계산
                 nearbyStops = stops.map { stop in
                     let distance = calculateDistance(
                         from: coordinate,

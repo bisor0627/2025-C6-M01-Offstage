@@ -6,7 +6,6 @@ import Foundation
 @MainActor
 final class HomeViewModel: ObservableObject {
     @Published var nearestBusStop: BusStop?
-    @Published var busRoutes: [BusRoute] = []
     @Published var isLoading = false
     /// Set when bus data could not be loaded, as opposed to "no stops nearby".
     @Published var loadFailure: LoadFailure?
@@ -23,13 +22,6 @@ final class HomeViewModel: ObservableObject {
 
     init(locationProvider: LocationProviding = LocationManager.shared) {
         self.locationProvider = locationProvider
-    }
-
-    private func detectCityCode(from gps: CLLocationCoordinate2D) async throws -> String {
-        guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
-            throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
-        }
-        return CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
     }
 
     func fetchNearestStop() {
@@ -50,45 +42,18 @@ final class HomeViewModel: ObservableObject {
                     coordinate = CLLocationCoordinate2D(latitude: location.latitude, longitude: location.longitude)
                 }
 
-                let cityCodeString = try await detectCityCode(from: coordinate)
-                let stops = try await busRepository.fetchStopsNearby(
-                    latitude: coordinate.latitude,
-                    longitude: coordinate.longitude,
-                    cityCode: cityCodeString
+                let stops = try await BusCityRouting.nearbyStops(
+                    around: coordinate,
+                    repository: busRepository,
+                    locationProvider: locationProvider
                 )
-
-                if let firstStop = stops.first {
-                    nearestBusStop = firstStop
-                    await fetchBusRoutes(for: firstStop)
-                } else {
-                    nearestBusStop = nil
-                    busRoutes = []
-                }
+                nearestBusStop = stops.first
 
             } catch {
                 print("Error fetching nearest stop: \(error)")
                 loadFailure = Self.loadFailure(for: error)
                 nearestBusStop = nil
-                busRoutes = []
             }
-        }
-    }
-
-    private func fetchBusRoutes(for stop: BusStop) async {
-        do {
-            let cityCodeString = try await detectCityCode(from: CLLocationCoordinate2D(
-                latitude: stop.latitude,
-                longitude: stop.longitude
-            ))
-            let routes = try await busRepository.fetchRoutesPassingThroughStop(
-                cityCode: cityCodeString,
-                nodeId: stop.nodeId
-            )
-            busRoutes = routes
-        } catch {
-            print("Error fetching bus routes: \(error)")
-            loadFailure = Self.loadFailure(for: error)
-            busRoutes = []
         }
     }
 

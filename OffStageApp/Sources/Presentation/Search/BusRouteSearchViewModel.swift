@@ -67,10 +67,7 @@ final class BusRouteSearchViewModel: ObservableObject {
         isLoading = true
         defer { isLoading = false }
         do {
-            let cityCodeString = try await detectCityCode(from: CLLocationCoordinate2D(
-                latitude: busStop.latitude,
-                longitude: busStop.longitude
-            ))
+            let cityCodeString = try await BusCityRouting.code(for: busStop, locationProvider: LocationManager.shared)
 
             let routes = try await busRepository.fetchRoutesPassingThroughStop(
                 cityCode: cityCodeString,
@@ -107,13 +104,5 @@ final class BusRouteSearchViewModel: ObservableObject {
             }
             isFiltered = true
         }
-    }
-
-    private func detectCityCode(from gps: CLLocationCoordinate2D) async throws -> String {
-        let locationProvider = LocationManager.shared
-        guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
-            throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
-        }
-        return CityCodeConverter.findCode(from: placemark) ?? "31020"
     }
 }
