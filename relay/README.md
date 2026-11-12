@@ -5,8 +5,8 @@ carry no API keys and repeated lookups share one cached answer.
 
 | Route | Upstream | Cache |
 |---|---|---|
-| `GET /v1/tago/<Service>/<operation>` | 국토교통부 TAGO `apis.data.go.kr/1613000` (13 operations) | arrivals/locations 15 s, stops/routes 1 day, city codes 7 days |
-| `GET /v1/seoul/<group>/<operation>` | 서울 버스 `ws.bus.go.kr/api/rest`, over http (8 operations) | arrivals/positions 15 s, stations/routes 1 day |
+| `GET /v1/tago/<Service>/<operation>` | 국토교통부 TAGO `apis.data.go.kr/1613000` (13 operations) | arrivals/locations 15 s, stops/routes 1 day, city codes 7 days; nearby-stop lookups (user coordinates) never cached |
+| `GET /v1/seoul/<group>/<operation>` | 서울 버스 `ws.bus.go.kr/api/rest`, over http (8 operations) | arrivals/positions 15 s, stations/routes 1 day; getStationByPos never cached |
 
 Only the operations in `ROUTES` (`src/index.js`) pass; anything else is 404.
 Responses are the upstream JSON unchanged. Refusals: 429 (60/min per IP),

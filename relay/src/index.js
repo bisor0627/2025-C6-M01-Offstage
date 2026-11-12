@@ -25,7 +25,7 @@ export const ROUTES = {
     'BusLcInfoInqireService/getRouteAcctoBusLcList': { service: 'tago-location', ttl: 15 * SEC },
     'BusSttnInfoInqireService/getCtyCodeList': { service: 'tago-stop', ttl: 7 * DAY },
     'BusSttnInfoInqireService/getSttnNoList': { service: 'tago-stop', ttl: DAY },
-    'BusSttnInfoInqireService/getCrdntPrxmtSttnList': { service: 'tago-stop', ttl: DAY },
+    'BusSttnInfoInqireService/getCrdntPrxmtSttnList': { service: 'tago-stop', ttl: 0 }, // user coordinates: never cached
     'BusSttnInfoInqireService/getSttnThrghRouteList': { service: 'tago-stop', ttl: DAY },
     'BusRouteInfoInqireService/getCtyCodeList': { service: 'tago-route', ttl: 7 * DAY },
     'BusRouteInfoInqireService/getRouteInfoIem': { service: 'tago-route', ttl: DAY },
@@ -37,7 +37,7 @@ export const ROUTES = {
   },
   seoul: {
     'stationinfo/getStationByName': { service: 'seoul-station', ttl: DAY },
-    'stationinfo/getStationByPos': { service: 'seoul-station', ttl: DAY },
+    'stationinfo/getStationByPos': { service: 'seoul-station', ttl: 0 }, // user coordinates: never cached
     'stationinfo/getRouteByStation': { service: 'seoul-station', ttl: DAY },
     'stationinfo/getStationByUid': { service: 'seoul-station', ttl: 15 * SEC },
     'busRouteInfo/getBusRouteList': { service: 'seoul-route', ttl: DAY },
@@ -147,9 +147,10 @@ const capped = () => ({ body: JSON.stringify({ error: 'daily cap' }), status: 50
 async function cached(cacheKey, ctx, ttl, load) {
   const cache = caches.default;
   const key = new Request(cacheKey, { method: 'GET' });
-  const hit = await cache.match(key);
+  const hit = ttl > 0 ? await cache.match(key) : undefined;
   if (hit) return hit;
-  const { body, status, cache: keep } = await load();
+  const { body, status, cache: ok } = await load();
+  const keep = ok && ttl > 0;
   const res = new Response(body, {
     status,
     headers: {

@@ -9,6 +9,11 @@ test('every app operation is routed', () => {
   assert.equal(matchRoute('/v1/seoul/stationinfo/getStationByUid').service, 'seoul-station');
 });
 
+test('nearby-stop lookups carry user coordinates and are never cached', () => {
+  assert.equal(matchRoute('/v1/tago/BusSttnInfoInqireService/getCrdntPrxmtSttnList').ttl, 0);
+  assert.equal(matchRoute('/v1/seoul/stationinfo/getStationByPos').ttl, 0);
+});
+
 test('unknown paths are refused', () => {
   assert.equal(matchRoute('/v1/tago/ArvlInfoInqireService/getEverything'), null);
   assert.equal(matchRoute('/v1/seoul/../../etc'), null);
