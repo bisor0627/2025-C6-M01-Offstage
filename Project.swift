@@ -2,6 +2,9 @@ import ProjectDescription
 
 let organizationName = "2025C6.OffStage"
 
+/// Same minimum as the released 1.0.3; without it Tuist uses the SDK version.
+let deploymentTargets: DeploymentTargets = .iOS("18.5")
+
 let baseInfoPlist: [String: Plist.Value] = [
     "CFBundleDisplayName": "$(APP_DISPLAY_NAME)",
     "UILaunchScreen": [
@@ -41,6 +44,7 @@ let busAPI = Target.target(
     destinations: [.iPhone],
     product: .framework,
     bundleId: "\(organizationName).BusAPI",
+    deploymentTargets: deploymentTargets,
     infoPlist: .extendingDefault(with: baseInfoPlist),
     sources: ["Modules/BusAPI/Sources/**"],
     dependencies: [
@@ -61,6 +65,7 @@ let app = Target.target(
     destinations: [.iPhone],
     product: .app,
     bundleId: "$(PRODUCT_BUNDLE_IDENTIFIER)",
+    deploymentTargets: deploymentTargets,
     infoPlist: .extendingDefault(with: baseInfoPlist),
     sources: ["OffStageApp/Sources/**"],
     resources: ["OffStageApp/Resources/**", "OffStageApp/Resources/*.mlmodel"],
