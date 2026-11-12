@@ -40,7 +40,8 @@ platform :ios do
     UI.user_error!("CFBundleVersion #{build_number} must be above #{latest}; bump it in Project.swift") if build_number && build_number.to_i <= latest
     build_app(
       workspace: '버스온다.xcworkspace',
-      scheme: '버스온다',
+      # xcodebuild lists Hangul scheme names in NFD; an NFC name doesn't match.
+      scheme: '버스온다'.unicode_normalize(:nfd),
       configuration: 'Release-Prod',
       export_method: 'app-store',
       output_directory: 'build',
