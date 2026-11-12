@@ -7,9 +7,10 @@
 // data.go.kr key (one key per account covers both providers) and forces JSON,
 // so the app ships no keys and needs no ATS exception for ws.bus.go.kr.
 //
-// Guards: 60 requests per minute per IP (429), and a daily cap per upstream
-// service counted only on cache misses (503 until midnight KST) so the key
-// never hits its own quota. The free Workers plan refuses requests past its
+// Guards: 60 requests per minute per IP (429); per day, counted only on cache
+// misses, a cap per IP (429) so one client can't use up the shared quota, and a
+// cap per upstream service (503 until midnight KST) so the key never hits its
+// own quota. IPs are only kept as a per-day hash. The free Workers plan refuses requests past its
 // limit; nothing is billed.
 //
 // Responses are the upstream JSON unchanged. Upstream key/quota errors are not
@@ -18,32 +19,38 @@
 const SEC = 1;
 const DAY = 24 * 60 * 60;
 
-/// path → { service: daily-cap bucket, ttl: edge cache seconds }
+/// path → { service: daily-cap bucket, ttl: edge cache seconds, params: query
+/// parameters passed upstream }. Anything else in the query is dropped, so junk
+/// parameters can't make every request a cache miss.
+const PAGE = ['pageNo', 'numOfRows'];
 export const ROUTES = {
   tago: {
-    'BusLcInfoInqireService/getCtyCodeList': { service: 'tago-location', ttl: 7 * DAY },
-    'BusLcInfoInqireService/getRouteAcctoBusLcList': { service: 'tago-location', ttl: 15 * SEC },
-    'BusSttnInfoInqireService/getCtyCodeList': { service: 'tago-stop', ttl: 7 * DAY },
-    'BusSttnInfoInqireService/getSttnNoList': { service: 'tago-stop', ttl: DAY },
-    'BusSttnInfoInqireService/getCrdntPrxmtSttnList': { service: 'tago-stop', ttl: 0 }, // user coordinates: never cached
-    'BusSttnInfoInqireService/getSttnThrghRouteList': { service: 'tago-stop', ttl: DAY },
-    'BusRouteInfoInqireService/getCtyCodeList': { service: 'tago-route', ttl: 7 * DAY },
-    'BusRouteInfoInqireService/getRouteInfoIem': { service: 'tago-route', ttl: DAY },
-    'BusRouteInfoInqireService/getRouteNoList': { service: 'tago-route', ttl: DAY },
-    'BusRouteInfoInqireService/getRouteAcctoThrghSttnList': { service: 'tago-route', ttl: DAY },
-    'ArvlInfoInqireService/getCtyCodeList': { service: 'tago-arrival', ttl: 7 * DAY },
-    'ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList': { service: 'tago-arrival', ttl: 15 * SEC },
-    'ArvlInfoInqireService/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList': { service: 'tago-arrival', ttl: 15 * SEC },
+    'BusLcInfoInqireService/getCtyCodeList': { service: 'tago-location', ttl: 7 * DAY, params: [] },
+    'BusLcInfoInqireService/getRouteAcctoBusLcList': { service: 'tago-location', ttl: 10 * SEC, params: ['cityCode', 'routeId', ...PAGE] },
+    'BusSttnInfoInqireService/getCtyCodeList': { service: 'tago-stop', ttl: 7 * DAY, params: [] },
+    'BusSttnInfoInqireService/getSttnNoList': { service: 'tago-stop', ttl: DAY, params: ['cityCode', 'nodeNm', 'nodeNo', ...PAGE] },
+    // User coordinates: never cached.
+    'BusSttnInfoInqireService/getCrdntPrxmtSttnList': { service: 'tago-stop', ttl: 0, params: ['gpsLati', 'gpsLong', ...PAGE] },
+    'BusSttnInfoInqireService/getSttnThrghRouteList': { service: 'tago-stop', ttl: DAY, params: ['cityCode', 'nodeid', ...PAGE] },
+    'BusRouteInfoInqireService/getCtyCodeList': { service: 'tago-route', ttl: 7 * DAY, params: [] },
+    'BusRouteInfoInqireService/getRouteInfoIem': { service: 'tago-route', ttl: DAY, params: ['cityCode', 'routeId'] },
+    'BusRouteInfoInqireService/getRouteNoList': { service: 'tago-route', ttl: DAY, params: ['cityCode', 'routeNo', ...PAGE] },
+    'BusRouteInfoInqireService/getRouteAcctoThrghSttnList': { service: 'tago-route', ttl: DAY, params: ['cityCode', 'routeId', ...PAGE] },
+    'ArvlInfoInqireService/getCtyCodeList': { service: 'tago-arrival', ttl: 7 * DAY, params: [] },
+    'ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList': { service: 'tago-arrival', ttl: 10 * SEC, params: ['cityCode', 'nodeId', ...PAGE] },
+    'ArvlInfoInqireService/getSttnAcctoSpcifyRouteBusArvlPrearngeInfoList': { service: 'tago-arrival', ttl: 10 * SEC, params: ['cityCode', 'nodeId', 'routeId', ...PAGE] },
   },
   seoul: {
-    'stationinfo/getStationByName': { service: 'seoul-station', ttl: DAY },
-    'stationinfo/getStationByPos': { service: 'seoul-station', ttl: 0 }, // user coordinates: never cached
-    'stationinfo/getRouteByStation': { service: 'seoul-station', ttl: DAY },
-    'stationinfo/getStationByUid': { service: 'seoul-station', ttl: 15 * SEC },
-    'busRouteInfo/getBusRouteList': { service: 'seoul-route', ttl: DAY },
-    'busRouteInfo/getStaionByRoute': { service: 'seoul-route', ttl: DAY },
-    'arrive/getArrInfoByRoute': { service: 'seoul-arrival', ttl: 15 * SEC },
-    'buspos/getBusPosByRtid': { service: 'seoul-buspos', ttl: 15 * SEC },
+    'stationinfo/getStationByName': { service: 'seoul-station', ttl: DAY, params: ['stSrch'] },
+    // User coordinates: never cached.
+    'stationinfo/getStationByPos': { service: 'seoul-station', ttl: 0, params: ['tmX', 'tmY', 'radius'] },
+    'stationinfo/getRouteByStation': { service: 'seoul-station', ttl: DAY, params: ['arsId'] },
+    'stationinfo/getStationByUid': { service: 'seoul-station', ttl: 10 * SEC, params: ['arsId'] },
+    'busRouteInfo/getBusRouteList': { service: 'seoul-route', ttl: DAY, params: ['strSrch'] },
+    'busRouteInfo/getRouteInfo': { service: 'seoul-route', ttl: DAY, params: ['busRouteId'] },
+    'busRouteInfo/getStaionByRoute': { service: 'seoul-route', ttl: DAY, params: ['busRouteId'] },
+    'arrive/getArrInfoByRoute': { service: 'seoul-arrival', ttl: 10 * SEC, params: ['stId', 'busRouteId', 'ord'] },
+    'buspos/getBusPosByRtid': { service: 'seoul-buspos', ttl: 10 * SEC, params: ['busRouteId'] },
   },
 };
 
@@ -67,11 +74,13 @@ export default {
     const route = matchRoute(url.pathname);
     if (!route) return json({ error: 'not found' }, 404);
 
-    const query = cleanQuery(url.searchParams, route.provider);
+    const query = cleanQuery(url.searchParams, route);
     const cacheKey = `${url.origin}/v1/${route.provider}/${route.path}?${query}`;
     return cached(cacheKey, ctx, route.ttl, async () => {
       const cap = route.provider === 'tago' ? env.TAGO_DAILY_CAP : env.SEOUL_DAILY_CAP;
-      if (!(await spend(env, route.service, cap))) return capped();
+      const spent = await spend(env, route.service, cap, await ipHash(ip), env.IP_DAILY_CAP);
+      if (spent === 'ip') return { body: JSON.stringify({ error: 'rate' }), status: 429, cache: false };
+      if (spent === 'service') return capped();
       const upstream = `${UPSTREAM[route.provider].base}${route.path}?serviceKey=${encodeURIComponent(env.DATA_GO_KR_KEY)}&${query}`;
       const res = await fetch(upstream, { headers: { accept: 'application/json' } });
       const body = await res.text();
@@ -89,11 +98,11 @@ export function matchRoute(pathname) {
   return entry ? { provider: m[1], path: m[2], ...entry } : null;
 }
 
-/// Drops any client-sent key or format, forces JSON, and sorts the rest so the
-/// same request always hits the same cache entry.
-export function cleanQuery(params, provider) {
-  const kept = [...params].filter(([k]) => !['servicekey', '_type', 'resulttype'].includes(k.toLowerCase()));
-  kept.push(UPSTREAM[provider].format);
+/// Keeps only the route's own parameters (so no client key, format or junk),
+/// forces JSON, and sorts them so the same request always hits the same cache entry.
+export function cleanQuery(params, route) {
+  const kept = [...params].filter(([k]) => route.params.includes(k));
+  kept.push(UPSTREAM[route.provider].format);
   kept.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
   return new URLSearchParams(kept).toString();
 }
@@ -117,7 +126,8 @@ export function isAnswer(provider, body) {
   return code === '0' || code === '4';
 }
 
-/// One counter per upstream service per day (KST), in one Durable Object.
+/// Daily counters (KST) for each upstream service and each client, in one
+/// Durable Object. Yesterday's counters are dropped on the first call of a day.
 export class DailyCounter {
   constructor(state) {
     this.storage = state.storage;
@@ -127,20 +137,39 @@ export class DailyCounter {
     const url = new URL(request.url);
     const service = url.searchParams.get('service');
     const cap = Number(url.searchParams.get('cap')) || 0;
-    const day = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
-    const key = `${service}:${day}`;
-    const used = ((await this.storage.get(key)) ?? 0) + 1;
-    if (cap > 0 && used > cap) return new Response('capped', { status: 429 });
-    await this.storage.put(key, used);
+    const client = url.searchParams.get('client');
+    const clientCap = Number(url.searchParams.get('clientCap')) || 0;
+    const day = kstDay();
+    if ((await this.storage.get('day')) !== day) {
+      await this.storage.deleteAll();
+      await this.storage.put('day', day);
+    }
+    const clientKey = `client:${client}`;
+    const clientUsed = ((await this.storage.get(clientKey)) ?? 0) + 1;
+    if (client && clientCap > 0 && clientUsed > clientCap) return new Response('ip', { status: 429 });
+    const serviceKey = `service:${service}`;
+    const used = ((await this.storage.get(serviceKey)) ?? 0) + 1;
+    if (cap > 0 && used > cap) return new Response('service', { status: 429 });
+    await this.storage.put({ [serviceKey]: used, [clientKey]: clientUsed });
     return new Response(String(used));
   }
 }
 
-async function spend(env, service, cap) {
+/// 'ok', or which daily cap refused the call: 'ip' or 'service'.
+async function spend(env, service, cap, client, clientCap) {
   const counter = env.COUNTER.get(env.COUNTER.idFromName('daily'));
-  const res = await counter.fetch(`https://counter/?service=${service}&cap=${Number(cap) || 0}`);
-  return res.ok;
+  const query = new URLSearchParams({ service, cap: String(Number(cap) || 0), client, clientCap: String(Number(clientCap) || 0) });
+  const res = await counter.fetch(`https://counter/?${query}`);
+  return res.ok ? 'ok' : await res.text();
 }
+
+/// A per-day hash of the client IP, so the counter never stores the address.
+export async function ipHash(ip, day = kstDay()) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`${day}:${ip}`));
+  return [...new Uint8Array(digest).slice(0, 8)].map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+const kstDay = () => new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 
 const capped = () => ({ body: JSON.stringify({ error: 'daily cap' }), status: 503, cache: false });
 

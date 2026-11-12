@@ -1,11 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { cleanQuery, isAnswer, matchRoute, ROUTES } from '../src/index.js';
+import { cleanQuery, ipHash, isAnswer, matchRoute, ROUTES } from '../src/index.js';
 
 test('every app operation is routed', () => {
   assert.equal(Object.keys(ROUTES.tago).length, 13);
-  assert.equal(Object.keys(ROUTES.seoul).length, 8);
-  assert.equal(matchRoute('/v1/tago/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList').ttl, 15);
+  assert.equal(Object.keys(ROUTES.seoul).length, 9);
+  assert.equal(matchRoute('/v1/tago/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList').ttl, 10);
+  assert.equal(matchRoute('/v1/seoul/busRouteInfo/getRouteInfo').service, 'seoul-route');
   assert.equal(matchRoute('/v1/seoul/stationinfo/getStationByUid').service, 'seoul-station');
 });
 
@@ -21,11 +22,29 @@ test('unknown paths are refused', () => {
   assert.equal(matchRoute('/'), null);
 });
 
-test('query drops client keys, forces json, sorts', () => {
-  const q = new URLSearchParams('serviceKey=leak&nodeId=X&cityCode=25&_type=xml');
-  assert.equal(cleanQuery(q, 'tago'), '_type=json&cityCode=25&nodeId=X');
-  const s = new URLSearchParams('ServiceKey=leak&arsId=01001&resultType=xml');
-  assert.equal(cleanQuery(s, 'seoul'), 'arsId=01001&resultType=json');
+test('query keeps only route params, forces json, sorts', () => {
+  const arrivals = matchRoute('/v1/tago/ArvlInfoInqireService/getSttnAcctoArvlPrearngeInfoList');
+  const q = new URLSearchParams('serviceKey=leak&nodeId=X&cityCode=25&_type=xml&bust=123');
+  assert.equal(cleanQuery(q, arrivals), '_type=json&cityCode=25&nodeId=X');
+  const uid = matchRoute('/v1/seoul/stationinfo/getStationByUid');
+  const s = new URLSearchParams('ServiceKey=leak&arsId=01001&resultType=xml&x=1');
+  assert.equal(cleanQuery(s, uid), 'arsId=01001&resultType=json');
+});
+
+test('every route declares its params', () => {
+  for (const provider of Object.keys(ROUTES)) {
+    for (const [path, route] of Object.entries(ROUTES[provider])) {
+      assert.ok(Array.isArray(route.params), `${provider}/${path}`);
+    }
+  }
+});
+
+test('client hash hides the IP and changes daily', async () => {
+  const a = await ipHash('203.0.113.7', '2026-11-12');
+  assert.equal(a, await ipHash('203.0.113.7', '2026-11-12'));
+  assert.notEqual(a, await ipHash('203.0.113.7', '2026-11-13'));
+  assert.notEqual(a, await ipHash('203.0.113.8', '2026-11-12'));
+  assert.match(a, /^[0-9a-f]{16}$/);
 });
 
 test('tago answers vs errors', () => {

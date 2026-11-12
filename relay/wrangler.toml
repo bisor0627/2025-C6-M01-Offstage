@@ -23,3 +23,6 @@ simple = { limit = 60, period = 60 }
 # the 트래픽 shown on each data.go.kr 활용신청 page (development accounts).
 TAGO_DAILY_CAP = "9000"
 SEOUL_DAILY_CAP = "900"
+# Per client IP per day, cache misses only. A long ride polls arrivals a few
+# hundred times; this keeps one client from using up a service cap alone.
+IP_DAILY_CAP = "1500"
