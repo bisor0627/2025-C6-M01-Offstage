@@ -23,7 +23,7 @@ struct TestView: View {
                         }
                     }
                     .pickerStyle(.segmented)
-                    .onChange(of: selectedProfile) { newProfile in
+                    .onChange(of: selectedProfile) { _, newProfile in
                         updateViewModel(for: newProfile)
                     }
 

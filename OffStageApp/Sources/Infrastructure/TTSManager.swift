@@ -34,7 +34,7 @@ final class TTSManager: NSObject, ObservableObject {
             try session.setCategory(
                 .playAndRecord,
                 mode: .default,
-                options: [.defaultToSpeaker, .allowBluetooth, .allowBluetoothA2DP]
+                options: [.defaultToSpeaker, .allowBluetoothHFP, .allowBluetoothA2DP]
             )
             try session.setActive(true)
         } catch {

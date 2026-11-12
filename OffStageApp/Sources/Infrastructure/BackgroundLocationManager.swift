@@ -37,8 +37,7 @@ final class BackgroundLocationManager: NSObject, ObservableObject {
         guard !isTracking else { return }
 
         // Always 권한이 있는지 확인
-        let status = CLLocationManager.authorizationStatus()
-        guard status == .authorizedAlways else {
+        guard PermissionManager.locationStatus == .authorizedAlways else {
             print("⚠️ Background location requires 'Always' authorization")
             return
         }

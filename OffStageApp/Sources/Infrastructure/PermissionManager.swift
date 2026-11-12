@@ -85,7 +85,7 @@ final class PermissionManager: NSObject, ObservableObject {
         deniedPermissions.removeAll()
 
         // 1. 위치
-        let locationStatus = CLLocationManager.authorizationStatus()
+        let locationStatus = Self.locationStatus
         if locationStatus == .denied || locationStatus == .restricted || locationStatus == .notDetermined {
             deniedPermissions.append(.location)
         }
@@ -97,8 +97,7 @@ final class PermissionManager: NSObject, ObservableObject {
         }
 
         // 3. 마이크
-        let microphoneStatus = AVAudioSession.sharedInstance().recordPermission
-        if microphoneStatus != .granted {
+        if AVAudioApplication.shared.recordPermission != .granted {
             deniedPermissions.append(.microphone)
         }
 
@@ -118,6 +117,11 @@ final class PermissionManager: NSObject, ObservableObject {
         }
     }
 
+    /// Current location authorization (the class method was deprecated in iOS 14).
+    static var locationStatus: CLAuthorizationStatus {
+        CLLocationManager().authorizationStatus
+    }
+
     func grantedPermissions() -> [PermissionType] {
         let allPermissions: [PermissionType] = [.location, .camera, .microphone, .speech]
         return allPermissions.filter { !deniedPermissions.contains($0) }
@@ -126,12 +130,12 @@ final class PermissionManager: NSObject, ObservableObject {
     func isGranted(_ permission: PermissionType) -> Bool {
         switch permission {
         case .location:
-            let status = CLLocationManager.authorizationStatus()
+            let status = Self.locationStatus
             return status == .authorizedWhenInUse || status == .authorizedAlways
         case .camera:
             return AVCaptureDevice.authorizationStatus(for: .video) == .authorized
         case .microphone:
-            return AVAudioSession.sharedInstance().recordPermission == .granted
+            return AVAudioApplication.shared.recordPermission == .granted
         case .speech:
             return SFSpeechRecognizer.authorizationStatus() == .authorized
         }
@@ -185,11 +189,7 @@ final class PermissionManager: NSObject, ObservableObject {
     // MARK: - 마이크 권한 요청
 
     private func requestMicrophone() async -> Bool {
-        await withCheckedContinuation { (cont: CheckedContinuation<Bool, Never>) in
-            AVAudioSession.sharedInstance().requestRecordPermission { granted in
-                cont.resume(returning: granted)
-            }
-        }
+        await AVAudioApplication.requestRecordPermission()
     }
 
     // MARK: - 음성 인식 권한 요청
