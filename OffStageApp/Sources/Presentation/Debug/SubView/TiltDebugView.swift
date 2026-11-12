@@ -1,13 +1,13 @@
 import SwiftUI
 
 struct TiltDebugView: View {
-    @StateObject private var tiltDataCollector = TiltDataCollector()
-    @StateObject private var tiltManager: TiltManager
+    @State private var tiltDataCollector = TiltDataCollector()
+    @State private var tiltManager: TiltManager
 
     init() {
         let dataCollector = TiltDataCollector()
-        _tiltDataCollector = StateObject(wrappedValue: dataCollector)
-        _tiltManager = StateObject(wrappedValue: TiltManager(dataCollector: dataCollector))
+        _tiltDataCollector = State(initialValue: dataCollector)
+        _tiltManager = State(initialValue: TiltManager(dataCollector: dataCollector))
     }
 
     var body: some View {

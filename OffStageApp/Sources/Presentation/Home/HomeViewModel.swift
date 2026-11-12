@@ -2,13 +2,15 @@ import BusAPI
 import Combine
 import CoreLocation
 import Foundation
+import Observation
 
 @MainActor
-final class HomeViewModel: ObservableObject {
-    @Published var nearestBusStop: BusStop?
-    @Published var isLoading = false
+@Observable
+final class HomeViewModel {
+    var nearestBusStop: BusStop?
+    var isLoading = false
     /// Set when bus data could not be loaded, as opposed to "no stops nearby".
-    @Published var loadFailure: LoadFailure?
+    var loadFailure: LoadFailure?
 
     enum LoadFailure {
         /// The relay used today's public API quota.

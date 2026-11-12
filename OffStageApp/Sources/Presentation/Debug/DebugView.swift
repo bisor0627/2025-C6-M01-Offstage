@@ -5,7 +5,7 @@
     import SwiftUI
 
     struct DebugView: View {
-        @EnvironmentObject var router: Router<AppRoute>
+        @Environment(Router<AppRoute>.self) var router
         @Environment(\.dismiss) private var dismiss
         private let locationManager = LocationManager.shared
 
@@ -166,7 +166,7 @@
     struct DebugView_Previews: PreviewProvider {
         static var previews: some View {
             DebugView()
-                .environmentObject(Router<AppRoute>(root: .home))
+                .environment(Router<AppRoute>(root: .home))
         }
     }
 #endif

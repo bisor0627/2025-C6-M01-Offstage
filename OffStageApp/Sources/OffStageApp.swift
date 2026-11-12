@@ -3,7 +3,7 @@ import SwiftUI
 
 #if DEBUG_MODE
     struct DebugOverlay<Content: View>: View {
-        @ObservedObject var router: Router<AppRoute>
+        var router: Router<AppRoute>
         @ViewBuilder let content: Content
         @State private var showDebugSheet = false
         @State private var position: CGPoint = .init(
@@ -38,7 +38,7 @@ import SwiftUI
                     )
                     .sheet(isPresented: $showDebugSheet) {
                         DebugView()
-                            .environmentObject(router)
+                            .environment(router)
                     }
                 }
 
@@ -71,17 +71,17 @@ import SwiftUI
 
 @main
 struct OffStageApp: App {
-    @StateObject private var router: Router<AppRoute>
-    @StateObject private var backgroundLocationManager = BackgroundLocationManager()
+    @State private var router: Router<AppRoute>
+    @State private var backgroundLocationManager = BackgroundLocationManager()
     @Environment(\.scenePhase) private var scenePhase
 
     init() {
         #if DEBUG_MODE
-            _router = StateObject(wrappedValue: Router(root: .permissionGuide))
+            _router = State(initialValue: Router(root: .permissionGuide))
         #else
             let hasLaunchedBefore = UserDefaults.standard.bool(forKey: "hasLaunchedBefore")
             // TODO: 온보딩 뷰 제작 후 .onboarding 으로 변경
-            _router = StateObject(wrappedValue: Router(root: hasLaunchedBefore ? .home : .permissionGuide))
+            _router = State(initialValue: Router(root: hasLaunchedBefore ? .home : .permissionGuide))
         #endif
     }
 

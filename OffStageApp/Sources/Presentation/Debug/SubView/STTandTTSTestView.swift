@@ -2,10 +2,10 @@ import Speech // (프로젝트 전역에서 쓰더라도 여기서 임포트해�
 import SwiftUI
 
 struct STTandTTSTestView: View {
-    @EnvironmentObject var router: Router<AppRoute>
+    @Environment(Router<AppRoute>.self) var router
     // 뷰 생애주기 동안 한 번 생성되어 유지되는 상태 객체
-    @StateObject private var speechRecognizer = STTManager()
-    @StateObject private var vm = TTSManager()
+    @State private var speechRecognizer = STTManager()
+    @State private var vm = TTSManager()
     @FocusState private var isTextEditorFocused: Bool // 키보드 내리기위한 값.
     @State private var ttsText: String = ""
 
@@ -14,7 +14,7 @@ struct STTandTTSTestView: View {
             Text(L10n.SttTtsTest.Ui.titleStt)
 
             // 인식된 텍스트 출력 영역
-            // - 실시간으로 transcript가 바뀌면 화면도 즉시 갱신됨(@Published → @StateObject 바인딩)
+            // - 실시간으로 transcript가 바뀌면 화면도 즉시 갱신됨(→ @State 바인딩)
             Group {
                 if speechRecognizer.transcript.isEmpty {
                     Text(L10n.SttTtsTest.Ui.placeholderStt)

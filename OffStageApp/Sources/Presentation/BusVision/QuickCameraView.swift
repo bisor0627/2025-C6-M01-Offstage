@@ -4,15 +4,15 @@ import SwiftUI
 /// 빠른 버스인식 뷰
 struct QuickCameraView: View {
     // properties
-    @StateObject var vm: QuickCameraViewModel
+    @State var vm: QuickCameraViewModel
     var routeNumber: String = ""
 
-    @EnvironmentObject var router: Router<AppRoute>
+    @Environment(Router<AppRoute>.self) var router
     @State var showHelpSheet: Bool = false
 
     /// init
     init(routeNo: String) {
-        _vm = StateObject(wrappedValue: QuickCameraViewModel(routeNo: routeNo))
+        _vm = State(initialValue: QuickCameraViewModel(routeNo: routeNo))
         routeNumber = routeNo
     }
 

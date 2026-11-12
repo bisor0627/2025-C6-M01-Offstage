@@ -3,25 +3,29 @@ import Combine
 import CoreHaptics
 import CoreLocation
 import Foundation
+import Observation
 
 @MainActor
-final class BusArrivalViewModel: ObservableObject {
+@Observable
+final class BusArrivalViewModel {
     // MARK: - Published 속성
 
-    @Published var routeWithArrival: BusRouteWithArrival?
-    @Published var busLocationInfo: BusLocation?
-    @Published var isLoading = false
-    @Published var errorMessage: String?
-    @Published var currentEstimatedArrivalTime: Int?
-    @Published var isNavigating = false
+    var routeWithArrival: BusRouteWithArrival?
+    var busLocationInfo: BusLocation?
+    var isLoading = false
+    var errorMessage: String?
+    var currentEstimatedArrivalTime: Int?
+    var isNavigating = false
 
     // MARK: - 속성
 
     let busStop: BusStop
     let busRoute: BusRoute
     private let busArrivalOperations: BusArrivalOperations
-    private var arrivalMonitoringTask: Task<Void, Never>?
-    private var countdownTimer: Timer?
+    /// Cancelled from deinit, so it lives outside main-actor observation.
+    @ObservationIgnored private nonisolated(unsafe) var arrivalMonitoringTask: Task<Void, Never>?
+    /// Cancelled from deinit, so it lives outside main-actor observation.
+    @ObservationIgnored private nonisolated(unsafe) var countdownTimer: Timer?
     private let hapticManager = HapticManager.shared
 
     /// Haptic 중복 방지 플래그

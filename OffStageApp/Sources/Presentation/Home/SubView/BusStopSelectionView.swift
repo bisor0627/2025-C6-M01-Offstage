@@ -14,7 +14,7 @@ struct BusStopSelectionView: View {
     let onRefresh: (() -> Void)?
 
     /// ViewModel - 근처 정류장 데이터를 관리
-    @StateObject private var viewModel = BusStopSelectionViewModel()
+    @State private var viewModel = BusStopSelectionViewModel()
 
     /// Sheet를 닫기 위한 Environment 변수
     @Environment(\.dismiss) private var dismiss

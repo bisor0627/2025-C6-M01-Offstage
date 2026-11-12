@@ -1,12 +1,14 @@
 import AVFoundation
-import Combine // ObservableObject, @Published 등을 사용해 View에 상태 전달
+import Combine // ObservableObject, 등을 사용해 View에 상태 전달
 import Foundation
+import Observation
 import UIKit
 
-final class TTSManager: NSObject, ObservableObject {
+@Observable
+final class TTSManager: NSObject {
     // MARK: - 공개 상태 (View에서 바인딩)
 
-    @Published var selectedLanguage: String = "ko-KR" // 언어 고정: 한국어
+    var selectedLanguage: String = "ko-KR" // 언어 고정: 한국어
 
     /// 재생 예정인 텍스트 큐
     private var speechQueue: [String] = []

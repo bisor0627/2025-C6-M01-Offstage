@@ -1,18 +1,27 @@
 import BusAPI
 import Combine
 import Foundation
+import Observation
 
-class BusVisionArrivalAlertManager: ObservableObject {
+@Observable
+class BusVisionArrivalAlertManager {
     // MARK: - Properties
 
     /// 도착예정시간 (초)
-    @Published var arrivalTime: Int = 0
+    var arrivalTime: Int = 0
     /// 남은 정류장 개수
-    @Published var remainingStops: Int = 0
-    @Published var currentState: BusNotificationState = .waitingForArrival
+    var remainingStops: Int = 0
+    var currentState: BusNotificationState = .waitingForArrival
 
-    /// 알림 표시 상태 (View에서 이걸로 알림뷰 띄움)
-    @Published var showSoonArrivalAlert: Bool = false
+    /// 알림 표시 상태 (View에서 이걸로 알림뷰 띄움). Combine 구독은 soonArrivalAlertPublisher로 합니다.
+    var showSoonArrivalAlert: Bool = false {
+        didSet { soonArrivalAlertSubject.send(showSoonArrivalAlert) }
+    }
+
+    @ObservationIgnored private let soonArrivalAlertSubject = CurrentValueSubject<Bool, Never>(false)
+    var soonArrivalAlertPublisher: AnyPublisher<Bool, Never> {
+        soonArrivalAlertSubject.eraseToAnyPublisher()
+    }
 
     private var timer: Timer?
     private let busStop: BusStop

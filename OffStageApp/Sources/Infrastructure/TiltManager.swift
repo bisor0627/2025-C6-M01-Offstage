@@ -1,15 +1,17 @@
 import AVFoundation
 import Combine
 import Foundation
+import Observation
 
-class TiltManager: ObservableObject {
+@Observable
+class TiltManager {
     // MARK: - Properties
 
     /// 기준점이 되는 기울기값
     let properTilt: Float = 0.1
 
     /// 실시간으로 업데이트되는 기울기 값
-    @Published var degreeTilt: Float = 0 {
+    var degreeTilt: Float = 0 {
         didSet {
             offsetZ = abs(degreeTilt - properTilt)
             autoUpdateHapticFeedback()
@@ -17,10 +19,17 @@ class TiltManager: ObservableObject {
     }
 
     /// UI 표시용 앞뒤 오프셋 값
-    @Published var offsetZ: Float = 0
+    var offsetZ: Float = 0
 
-    /// Published된 기울기 상태 (Combine 사용을 위해)
-    @Published var publishedTiltState: TiltState = .normal
+    /// 기울기 상태. Combine 구독은 tiltStatePublisher로 합니다.
+    var publishedTiltState: TiltState = .normal {
+        didSet { tiltStateSubject.send(publishedTiltState) }
+    }
+
+    @ObservationIgnored private let tiltStateSubject = CurrentValueSubject<TiltState, Never>(.normal)
+    var tiltStatePublisher: AnyPublisher<TiltState, Never> {
+        tiltStateSubject.eraseToAnyPublisher()
+    }
 
     /// Combine 구독을 관리하는 Set
     private var cancellables = Set<AnyCancellable>()
@@ -85,9 +94,9 @@ class TiltManager: ObservableObject {
     init(
         dataCollector: TiltDataCollector
     ) {
-        dataCollector.$gravityZ
+        dataCollector.gravityZPublisher
             .map { Float($0) }
-            .assign(to: \.degreeTilt, on: self)
+            .assign(to: \TiltManager.degreeTilt, on: self)
             .store(in: &cancellables)
 
         // 초기 오프셋 값 계산

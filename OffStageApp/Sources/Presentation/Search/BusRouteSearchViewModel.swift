@@ -1,19 +1,22 @@
 import BusAPI
 import CoreLocation
 import Foundation
+import Observation
 
 @MainActor
-final class BusRouteSearchViewModel: ObservableObject {
-    @Published var busRoutes: [BusRouteWithArrival] = []
-    @Published var isLoading = false
-    @Published var errorMessage: String?
-    @Published var isFiltered = false
-    @Published var recognizedText: String
+@Observable
+final class BusRouteSearchViewModel {
+    var busRoutes: [BusRouteWithArrival] = []
+    var isLoading = false
+    var errorMessage: String?
+    var isFiltered = false
+    var recognizedText: String
 
     private let busRepository = MainBusRepository()
     let busStop: BusStop
 
-    private var refreshTask: Task<Void, Never>?
+    /// Cancelled from deinit, so it lives outside main-actor observation.
+    @ObservationIgnored private nonisolated(unsafe) var refreshTask: Task<Void, Never>?
     private(set) var allBusRoutes: [BusRouteWithArrival] = []
 
     var allBusRoutesLoaded: Bool {

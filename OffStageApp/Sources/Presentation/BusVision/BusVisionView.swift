@@ -7,16 +7,16 @@ struct BusVisionView: View {
     // properties
     var busStop: BusStop
     var busRoute: BusRoute
-    @StateObject var vm: BusVisionViewModel
+    @State var vm: BusVisionViewModel
 
-    @EnvironmentObject var router: Router<AppRoute>
+    @Environment(Router<AppRoute>.self) var router
     @State var showHelpSheet: Bool = false
 
     /// init
     init(busStop: BusStop, busRoute: BusRoute) {
         self.busStop = busStop
         self.busRoute = busRoute
-        _vm = StateObject(wrappedValue: BusVisionViewModel(
+        _vm = State(initialValue: BusVisionViewModel(
             busStop: busStop,
             busRoute: busRoute
         ))

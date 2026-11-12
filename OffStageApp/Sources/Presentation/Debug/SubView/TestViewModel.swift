@@ -3,6 +3,7 @@ import Combine
 import CoreLocation
 import Foundation
 import Logging
+import Observation
 
 struct DTOSection: Identifiable {
     struct Item: Identifiable {
@@ -17,20 +18,21 @@ struct DTOSection: Identifiable {
 }
 
 @MainActor
-final class TestViewModel: ObservableObject {
-    @Published var resultText: String = "API 응답이 이 영역에 표시됩니다."
-    @Published var isLoading = false
-    @Published var displaySections: [DTOSection]?
-    @Published var rawResponseText: String?
+@Observable
+final class TestViewModel {
+    var resultText: String = "API 응답이 이 영역에 표시됩니다."
+    var isLoading = false
+    var displaySections: [DTOSection]?
+    var rawResponseText: String?
 
     // Properties for text fields
-    @Published var cityCode: String = "1000"
-    @Published var nodeId: String = "100000001"
-    @Published var routeId: String = "100100006"
-    @Published var stopName: String = "서울역"
-    @Published var routeNo: String = "100"
-    @Published var gpsLati: String = "37.555946"
-    @Published var gpsLong: String = "126.972317"
+    var cityCode: String = "1000"
+    var nodeId: String = "100000001"
+    var routeId: String = "100100006"
+    var stopName: String = "서울역"
+    var routeNo: String = "100"
+    var gpsLati: String = "37.555946"
+    var gpsLong: String = "126.972317"
 
     private let locationProvider: LocationProviding
     private let busRepository: BusRepository

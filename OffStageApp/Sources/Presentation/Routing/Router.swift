@@ -1,9 +1,10 @@
 import Combine
 import SwiftUI
 
-final class Router<T: Routable>: ObservableObject {
-    @Published var root: T
-    @Published var paths: [T] = []
+@Observable
+final class Router<T: Routable> {
+    var root: T
+    var paths: [T] = []
 
     init(root: T) {
         self.root = root

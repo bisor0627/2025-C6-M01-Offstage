@@ -10,7 +10,7 @@ enum TestProfile: String, CaseIterable, Identifiable {
 }
 
 struct TestView: View {
-    @StateObject private var viewModel = TestViewModel()
+    @State private var viewModel = TestViewModel()
     @State private var selectedProfile: TestProfile = .seoul
 
     var body: some View {

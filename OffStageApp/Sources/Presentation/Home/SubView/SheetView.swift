@@ -5,10 +5,10 @@ struct SheetView: View {
     @AccessibilityFocusState private var isListeningFocused: Bool
     @Environment(\.dismiss) private var dismiss
     @State private var step: Int = 0
-    @StateObject private var viewModel: SheetViewModel
+    @State private var viewModel: SheetViewModel
 
     init(onTextRecognized: @escaping (String) -> Void) {
-        _viewModel = StateObject(wrappedValue: SheetViewModel(
+        _viewModel = State(initialValue: SheetViewModel(
             onTextRecognized: onTextRecognized
         ))
     }

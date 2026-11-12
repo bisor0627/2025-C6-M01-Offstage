@@ -1,6 +1,7 @@
 import AVFoundation
 import Combine
 import CoreLocation
+import Observation
 import Speech
 import UIKit
 import UserNotifications
@@ -30,15 +31,16 @@ enum PermissionType: String, CaseIterable {
 // MARK: - Permission Manager
 
 /// 각종 시스템 권한(알림, 위치, 카메라, 마이크, 음성인식)을 한 번에 요청하는 클래스
-final class PermissionManager: NSObject, ObservableObject {
+@Observable
+final class PermissionManager: NSObject {
     /// CLLocationManager 인스턴스 (위치 권한 요청용)
     private var locationManager: CLLocationManager?
     /// 위치 권한 요청 시 async/await 비동기 처리를 위한 continuation 저장소
     private var locationContinuation: CheckedContinuation<CLAuthorizationStatus, Never>?
     /// 거부된 권한 목록
-    @Published var deniedPermissions: [PermissionType] = []
+    var deniedPermissions: [PermissionType] = []
     /// Sheet 표시 여부
-    @Published var showPermissionDeniedSheet: Bool = false
+    var showPermissionDeniedSheet: Bool = false
 
     // MARK: - 모든 권한 한꺼번에 요청
 

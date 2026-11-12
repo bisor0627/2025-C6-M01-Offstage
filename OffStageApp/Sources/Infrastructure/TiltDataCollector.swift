@@ -1,5 +1,7 @@
+import Combine
 import CoreMotion
 import Foundation
+import Observation
 
 /**
  CoreMotion 데이터를 수집하는 클래스
@@ -8,21 +10,30 @@ import Foundation
 
  ## 사용 예시
  ```swift
- @StateObject private var tiltCollector = TiltDataCollector()
+ @State private var tiltCollector = TiltDataCollector()
 
  var body: some View {
      Text("z: \(tiltCollector.gravityZ)")
  }
  ```
  */
-class TiltDataCollector: ObservableObject {
+@Observable
+class TiltDataCollector {
     // MARK: - Properties
 
     /// CoreMotion 데이터를 수집하는 모션 매니저
     private var motionManager = CMMotionManager()
 
     /// 디바이스가 앞뒤로 기울어진 정도
-    @Published var gravityZ: Double = 0.0
+    var gravityZ: Double = 0.0 {
+        didSet { gravityZSubject.send(gravityZ) }
+    }
+
+    /// gravityZ for Combine pipelines (TiltManager), which @Observable has no publisher for.
+    @ObservationIgnored private let gravityZSubject = CurrentValueSubject<Double, Never>(0.0)
+    var gravityZPublisher: AnyPublisher<Double, Never> {
+        gravityZSubject.eraseToAnyPublisher()
+    }
 
     // MARK: - init
 

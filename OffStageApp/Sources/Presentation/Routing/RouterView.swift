@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct RouterView<Route: Routable>: View {
-    @ObservedObject var router: Router<Route>
+    @Bindable var router: Router<Route>
 
     var body: some View {
         NavigationStack(path: $router.paths) {
@@ -10,6 +10,6 @@ struct RouterView<Route: Routable>: View {
                     route.view()
                 }
         }
-        .environmentObject(router)
+        .environment(router)
     }
 }

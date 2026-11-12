@@ -12,15 +12,15 @@ enum BusArrivalViewState {
 
 struct BusArrivalView: View {
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var router: Router<AppRoute>
-    @StateObject private var viewModel: BusArrivalViewModel
+    @Environment(Router<AppRoute>.self) var router
+    @State private var viewModel: BusArrivalViewModel
 
     init(busStop: BusStop, busRoute: BusRoute) {
-        _viewModel = StateObject(wrappedValue: BusArrivalViewModel(busStop: busStop, busRoute: busRoute))
+        _viewModel = State(initialValue: BusArrivalViewModel(busStop: busStop, busRoute: busRoute))
     }
 
     init(busStop: BusStop, routeWithArrival: BusRouteWithArrival) {
-        _viewModel = StateObject(wrappedValue: BusArrivalViewModel(
+        _viewModel = State(initialValue: BusArrivalViewModel(
             busStop: busStop,
             busRoute: routeWithArrival.route,
             initialArrival: routeWithArrival.arrival

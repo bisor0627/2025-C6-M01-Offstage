@@ -4,10 +4,10 @@ import SwiftUI
 import UIKit
 
 struct HomeView: View {
-    @EnvironmentObject var router: Router<AppRoute>
-    @StateObject private var viewModel: HomeViewModel
+    @Environment(Router<AppRoute>.self) var router
+    @State private var viewModel: HomeViewModel
 
-    @StateObject private var permissionManager = PermissionManager()
+    @State private var permissionManager = PermissionManager()
     @State private var isSheetPresented = false
     @State private var busNumberInput: String = ""
     @State private var isBusStopSelectionPresented = false
@@ -35,7 +35,7 @@ struct HomeView: View {
     }
 
     init() {
-        _viewModel = StateObject(wrappedValue: HomeViewModel())
+        _viewModel = State(initialValue: HomeViewModel())
     }
 
     var body: some View {

@@ -1,17 +1,24 @@
 import BusAPI
 import Combine
 import Foundation
+import Observation
 
-class BusVisionViewModel: ObservableObject {
+@Observable
+class BusVisionViewModel {
     // MARK: - Properties
 
     let busNumberToDetect: String
 
     /// VC에서 감지된 raw 감지된 status값
-    @Published var busDetectedState: BusDetectStatus = .unDetected
+    var busDetectedState: BusDetectStatus = .unDetected {
+        didSet { busDetectedStateSubject.send(busDetectedState) }
+    }
+
+    /// busDetectedState for the Combine pipeline below; @Observable has no $ publisher.
+    @ObservationIgnored private let busDetectedStateSubject = CurrentValueSubject<BusDetectStatus, Never>(.unDetected)
 
     /// UI에 보여줄 버스감지 상태
-    @Published var stateToPresent: BusDetectStatus = .unDetected
+    var stateToPresent: BusDetectStatus = .unDetected
 
     /// 내 버스가 감지된 시간
     private var lastMineDetectedTime: Date?
@@ -39,8 +46,9 @@ class BusVisionViewModel: ObservableObject {
         // busRoute.routeNumber에서 괄호 내용 제거
         busNumberToDetect = busRoute.routeNumber.removeParenthesesContent()
         alertManager = .init(busStop: busStop, busRoute: busRoute)
-        tiltDataCollector = TiltDataCollector()
-        tiltManager = TiltManager(dataCollector: tiltDataCollector)
+        let collector = TiltDataCollector()
+        tiltDataCollector = collector
+        tiltManager = TiltManager(dataCollector: collector)
 
         // combine 등록
         observeBusDetectStatus()
@@ -65,7 +73,7 @@ class BusVisionViewModel: ObservableObject {
 
 extension BusVisionViewModel {
     private func observeBusDetectStatus() {
-        $busDetectedState
+        busDetectedStateSubject
             .sink { [weak self] status in
                 guard let self else { return }
 
@@ -133,7 +141,7 @@ extension BusVisionViewModel {
 extension BusVisionViewModel {
     private func setupAlertObservers() {
         // false → true 변화만 감지
-        alertManager.$showSoonArrivalAlert
+        alertManager.soonArrivalAlertPublisher
             .removeDuplicates() // 값이 실제로 변경될 때만
             .filter { $0 == true }
             .sink { [weak self] _ in
@@ -155,7 +163,7 @@ extension BusVisionViewModel {
 
 extension BusVisionViewModel {
     private func observeTiltStateChanges() {
-        tiltManager.$publishedTiltState
+        tiltManager.tiltStatePublisher
             .removeDuplicates()
             .sink { [weak self] tiltState in
                 self?.handleTiltStateChange(tiltState)

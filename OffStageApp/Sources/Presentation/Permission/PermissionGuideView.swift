@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct PermissionGuideView: View {
-    @EnvironmentObject var router: Router<AppRoute>
+    @Environment(Router<AppRoute>.self) var router
 
     var body: some View {
         VStack {

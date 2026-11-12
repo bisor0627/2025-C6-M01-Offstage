@@ -8,7 +8,7 @@ private enum FlowStep {
 }
 
 struct MVPTestView: View {
-    @StateObject private var viewModel = MVPTestViewModel()
+    @State private var viewModel = MVPTestViewModel()
     @State private var step: FlowStep = .initial
 
     var body: some View {

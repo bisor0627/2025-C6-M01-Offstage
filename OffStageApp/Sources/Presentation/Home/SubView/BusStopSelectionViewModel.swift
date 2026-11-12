@@ -2,9 +2,11 @@ import BusAPI
 import Combine
 import CoreLocation
 import Foundation
+import Observation
 
 @MainActor
-final class BusStopSelectionViewModel: ObservableObject {
+@Observable
+final class BusStopSelectionViewModel {
     // MARK: - Data Model
 
     /// 정류장과 거리 정보를 함께 담는 구조체
@@ -20,13 +22,13 @@ final class BusStopSelectionViewModel: ObservableObject {
     // MARK: - Published Properties
 
     /// 근처 정류장 리스트 (거리 정보 포함)
-    @Published var nearbyStops: [StopWithDistance] = []
+    var nearbyStops: [StopWithDistance] = []
 
     /// 로딩 상태
-    @Published var isLoading = false
+    var isLoading = false
 
     /// 에러 메시지
-    @Published var errorMessage: String?
+    var errorMessage: String?
 
     // MARK: - Private Properties
 

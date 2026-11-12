@@ -14,9 +14,9 @@ enum FilterState: Equatable {
 }
 
 struct BusRouteSearchView: View {
-    @StateObject private var viewModel: BusRouteSearchViewModel
+    @State private var viewModel: BusRouteSearchViewModel
     @Environment(\.dismiss) private var dismiss
-    @EnvironmentObject var router: Router<AppRoute>
+    @Environment(Router<AppRoute>.self) var router
     @State private var isSheetPresented = false
 
     private var currentState: LoadingState {
@@ -35,7 +35,7 @@ struct BusRouteSearchView: View {
     }
 
     init(busStop: BusStop, recognizedText: String) {
-        _viewModel = StateObject(wrappedValue: BusRouteSearchViewModel(
+        _viewModel = State(initialValue: BusRouteSearchViewModel(
             busStop: busStop,
             recognizedText: recognizedText
         ))

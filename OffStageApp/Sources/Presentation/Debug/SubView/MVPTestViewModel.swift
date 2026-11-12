@@ -3,18 +3,20 @@ import Combine
 import CoreLocation
 import Foundation
 import Logging
+import Observation
 
 @MainActor
-final class MVPTestViewModel: ObservableObject {
-    @Published var resultText: String = "API 응답이 이 영역에 표시됩니다."
-    @Published var isLoading = false
-    @Published var displaySections: [DTOSection]?
-    @Published var rawResponseText: String?
-    @Published var routeQuery: String = "441"
+@Observable
+final class MVPTestViewModel {
+    var resultText: String = "API 응답이 이 영역에 표시됩니다."
+    var isLoading = false
+    var displaySections: [DTOSection]?
+    var rawResponseText: String?
+    var routeQuery: String = "441"
 
     // Location properties
-    @Published var gpsLati: String = ""
-    @Published var gpsLong: String = ""
+    var gpsLati: String = ""
+    var gpsLong: String = ""
 
     private let locationProvider: LocationProviding
     private let busRepository: BusRepository

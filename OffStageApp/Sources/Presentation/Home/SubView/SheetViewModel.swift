@@ -1,9 +1,11 @@
 import AVFoundation
 import BusAPI
 import Foundation
+import Observation
 
 @MainActor
-class SheetViewModel: ObservableObject {
+@Observable
+class SheetViewModel {
     private let synthesizer = AVSpeechSynthesizer()
     private let sttManager = STTManager()
     private var audioPlayer: AVAudioPlayer?

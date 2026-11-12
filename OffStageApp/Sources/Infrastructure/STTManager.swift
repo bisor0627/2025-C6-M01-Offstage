@@ -2,13 +2,15 @@ import Accelerate
 import AVFoundation // 마이크 캡처를 위한 오디오 세션/엔진
 import Combine // @Published와 ObservableObject를 통해 상태 변경을 UI에 전달하기 위해 필요
 import Foundation
+import Observation
 import Speech // SFSpeechRecognizer 등 음성 인식 API
 
-final class STTManager: NSObject, ObservableObject {
+@Observable
+final class STTManager: NSObject {
     // MARK: - 외부(UI)에서 관찰할 상태 값
 
-    @Published var transcript: String = "" // 실시간 인식 결과 텍스트
-    @Published var isListening: Bool = false // 현재 듣는 중 여부 (버튼 토글에 사용)
+    var transcript: String = "" // 실시간 인식 결과 텍스트
+    var isListening: Bool = false // 현재 듣는 중 여부 (버튼 토글에 사용)
 
     // MARK: - 내부 구성 요소
 
