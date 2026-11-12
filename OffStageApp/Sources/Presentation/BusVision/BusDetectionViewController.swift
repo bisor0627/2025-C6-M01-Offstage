@@ -8,13 +8,15 @@ final class BusDetectionViewController: UIViewController {
 
     /// input properties
     /// 인식할 노선번호
-    var routeNumberToDetect: String = ""
+    /// Set once before capture starts; read on the capture queue.
+    nonisolated(unsafe) var routeNumberToDetect: String = ""
     /// 감지된 상태가 변경될 때 SwiftUI에서 처리하기 위한 클로저
     var onDetectedStatusChanged: ((BusDetectStatus) -> Void)?
 
-    // APIs
+    /// APIs
     private var captureSession: AVCaptureSession?
-    private var busDetectionRequest: VNCoreMLRequest?
+    /// Capture-queue state: set up before capture starts, then used only on the capture queue.
+    private nonisolated(unsafe) var busDetectionRequest: VNCoreMLRequest?
     private var hapticManager = HapticManager.shared
     private var ttsManager: TTSManager = .init()
 
@@ -25,8 +27,8 @@ final class BusDetectionViewController: UIViewController {
     #endif
 
     // for view logic
-    var currentPixelBuffer: CVPixelBuffer?
-    private var frameCount: UInt = 0
+    nonisolated(unsafe) var currentPixelBuffer: CVPixelBuffer?
+    private nonisolated(unsafe) var frameCount: UInt = 0
 
     // MARK: Life Cycle
 
@@ -44,8 +46,10 @@ final class BusDetectionViewController: UIViewController {
             setupDebugModeBoxesView()
         #endif
 
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.captureSession?.startRunning()
+        // startRunning blocks, so it runs off the main thread.
+        nonisolated(unsafe) let session = captureSession
+        DispatchQueue.global(qos: .userInitiated).async {
+            session?.startRunning()
         }
     }
 
@@ -159,8 +163,8 @@ final class BusDetectionViewController: UIViewController {
 // MARK: - Video Delegate
 
 extension BusDetectionViewController: AVCaptureVideoDataOutputSampleBufferDelegate {
-    /// 실시간 캡쳐 Delegate
-    func captureOutput(
+    /// 실시간 캡쳐 Delegate (capture queue)
+    nonisolated func captureOutput(
         _: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
         from _: AVCaptureConnection
@@ -243,7 +247,7 @@ extension BusDetectionViewController {
     }
 
     /// AI 모델 결과 처리
-    func visionRequestDidComplete(request: VNRequest, error: Error?) {
+    nonisolated func visionRequestDidComplete(request: VNRequest, error: Error?) {
         handleVisionResults(request, error: error)
     }
 }

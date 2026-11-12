@@ -93,6 +93,7 @@ final class TTSManager: NSObject {
     }
 
     /// 보이스오버 음성 안내
+    @MainActor
     func a11yPost(of message: String) {
         if UIAccessibility.isVoiceOverRunning {
             UIAccessibility.post(notification: .announcement, argument: message)

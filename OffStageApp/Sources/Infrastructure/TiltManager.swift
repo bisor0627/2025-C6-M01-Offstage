@@ -3,8 +3,9 @@ import Combine
 import Foundation
 import Observation
 
+/// Driven by motion updates on the main queue, so all of its state lives on main.
 @Observable
-class TiltManager {
+class TiltManager: @unchecked Sendable {
     // MARK: - Properties
 
     /// 기준점이 되는 기울기값
@@ -94,9 +95,10 @@ class TiltManager {
     init(
         dataCollector: TiltDataCollector
     ) {
+        // sink with weak self: assign(to:on:) kept self alive forever.
         dataCollector.gravityZPublisher
             .map { Float($0) }
-            .assign(to: \TiltManager.degreeTilt, on: self)
+            .sink { [weak self] tilt in self?.degreeTilt = tilt }
             .store(in: &cancellables)
 
         // 초기 오프셋 값 계산

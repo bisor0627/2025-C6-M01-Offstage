@@ -1,6 +1,6 @@
 import Foundation
 
-public struct BusCity: Decodable, Hashable {
+public struct BusCity: Decodable, Hashable, Sendable {
     public let code: Int
     public let name: String
 

@@ -1,12 +1,11 @@
-import BusAPI
 import Foundation
 
 public final class MainBusRepository: BusRepository {
     #if DEBUG_MODE
         private let mockRepository = MockBusRepository()
     #endif
-    private lazy var realTagoRepository = TagoBusRepository()
-    private lazy var realSeoulRepository = SeoulBusRepository()
+    private let realTagoRepository = TagoBusRepository()
+    private let realSeoulRepository = SeoulBusRepository()
 
     private var tagoRepository: BusRepository {
         #if DEBUG_MODE

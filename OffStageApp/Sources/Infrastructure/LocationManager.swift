@@ -8,7 +8,8 @@ import MapKit
 /// This class is part of the Infrastructure layer and is responsible for all interactions
 /// with the `CLLocationManager` system API.
 final class LocationManager: NSObject, LocationProviding {
-    static let shared = LocationManager()
+    /// Shared on purpose; its framework callbacks arrive on their own threads, so it is not actor-bound.
+    nonisolated(unsafe) static let shared = LocationManager()
 
     private let locationManager = CLLocationManager()
     private let subject = PassthroughSubject<CLLocationCoordinate2D, Error>()
@@ -50,7 +51,7 @@ final class LocationManager: NSObject, LocationProviding {
         locationManager.stopUpdatingLocation()
     }
 
-    func requestLocation() async throws -> CLLocationCoordinate2D {
+    nonisolated(nonsending) func requestLocation() async throws -> CLLocationCoordinate2D {
         #if DEBUG_MODE
             if isOverrideEnabled, let overrideLocation {
                 return overrideLocation
@@ -77,7 +78,7 @@ final class LocationManager: NSObject, LocationProviding {
         }
     #endif
 
-    func fetchPlacemark(from location: CLLocationCoordinate2D) async throws -> CLPlacemark? {
+    nonisolated(nonsending) func fetchPlacemark(from location: CLLocationCoordinate2D) async throws -> CLPlacemark? {
         #if DEBUG_MODE
             if shouldUseMockData {
                 return mockC5Placemark(for: location)

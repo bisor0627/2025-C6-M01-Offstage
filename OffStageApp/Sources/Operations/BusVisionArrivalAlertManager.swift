@@ -3,6 +3,7 @@ import Combine
 import Foundation
 import Observation
 
+@MainActor
 @Observable
 class BusVisionArrivalAlertManager {
     // MARK: - Properties
@@ -23,7 +24,8 @@ class BusVisionArrivalAlertManager {
         soonArrivalAlertSubject.eraseToAnyPublisher()
     }
 
-    private var timer: Timer?
+    /// Invalidated from deinit, so it lives outside main-actor observation.
+    @ObservationIgnored private nonisolated(unsafe) var timer: Timer?
     private let busStop: BusStop
     private let busRoute: BusRoute
     private let busArrivalOperations: BusArrivalOperations
@@ -41,30 +43,33 @@ class BusVisionArrivalAlertManager {
     }
 
     deinit {
-        stopTracking() // 메모리 해제 시 타이머 정리
+        timer?.invalidate() // 메모리 해제 시 타이머 정리
     }
 
     // MARK: - Public Methods
 
     func startTracking() {
         // 5초마다 API 호출
+        // Scheduled on the main run loop, so the block runs on the main actor.
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            guard let self else { return }
+            MainActor.assumeIsolated {
+                guard let self else { return }
 
-            // 5초마다 API 호출
-            if elapsedTime % 5 == 0 {
-                fetchBusArrivalTime()
-            }
+                // 5초마다 API 호출
+                if self.elapsedTime % 5 == 0 {
+                    self.fetchBusArrivalTime()
+                }
 
-            if elapsedTime < Int.max - 1 {
-                elapsedTime += 1
-            } else {
-                elapsedTime = 0
-            }
+                if self.elapsedTime < Int.max - 1 {
+                    self.elapsedTime += 1
+                } else {
+                    self.elapsedTime = 0
+                }
 
-            // 도착시간이 줄어드는 걸 보여주기
-            if arrivalTime > 0 {
-                arrivalTime -= 1
+                // 도착시간이 줄어드는 걸 보여주기
+                if self.arrivalTime > 0 {
+                    self.arrivalTime -= 1
+                }
             }
         }
         // 즉시 한 번 호출

@@ -153,7 +153,9 @@ final class BusArrivalViewModel {
     private func startCountdownTimer() {
         stopCountdownTimer()
         countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.tick()
+            MainActor.assumeIsolated {
+                self?.tick()
+            }
         }
     }
 

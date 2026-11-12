@@ -1,6 +1,6 @@
 import Foundation
 
-public struct BusAPIHeader: Decodable {
+public struct BusAPIHeader: Decodable, Sendable {
     public let resultCode: String
     public let resultMessage: String
 
@@ -19,7 +19,7 @@ public struct BusAPIEnvelope<Item: Decodable>: Decodable {
     public let items: [Item]
     public let pagination: Pagination?
 
-    public struct Pagination: Decodable {
+    public struct Pagination: Decodable, Sendable {
         public let numOfRows: Int?
         public let pageNo: Int?
         public let totalCount: Int?
@@ -148,3 +148,5 @@ private struct AnyCodingKey: CodingKey {
         intValue = key.intValue
     }
 }
+
+extension BusAPIEnvelope: Sendable where Item: Sendable {}

@@ -5,7 +5,7 @@ import Vision
 
 extension BusDetectionViewController {
     /// 프레임이미지 버스에 맞게 자르기
-    func cropBusArea(prediction: VNRecognizedObjectObservation) -> CGRect? {
+    nonisolated func cropBusArea(prediction: VNRecognizedObjectObservation) -> CGRect? {
         var rectToCrop: CGRect = prediction.boundingBox
 
         // 버스 앞면인 경우 번호판 제거
@@ -45,7 +45,7 @@ extension BusDetectionViewController {
 
     /// 버스번호판 자르기용 하단부 자르기
     /// - 상단부의 80%만 남기고 하단부 20% 날리기
-    func cropFrontBusBottom(boundingBox: CGRect) -> CGRect {
+    nonisolated func cropFrontBusBottom(boundingBox: CGRect) -> CGRect {
         let croppedHeight = boundingBox.height * 0.7
         let yOffset = boundingBox.height - croppedHeight // 하단부터 날려야 하므로
 
@@ -58,7 +58,7 @@ extension BusDetectionViewController {
     }
 
     /// ocr 이미지를 위한 영역조절: 인식된 범위보다 조금씩 여유 가지고 자르도록 하기
-    func addMargins(boundingBox: CGRect) -> CGRect {
+    nonisolated func addMargins(boundingBox: CGRect) -> CGRect {
         let marginPercent: CGFloat = 0.05
 
         // 좌측, 우측 margin 추가

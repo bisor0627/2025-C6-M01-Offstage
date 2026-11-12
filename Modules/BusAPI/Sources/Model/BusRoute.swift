@@ -1,6 +1,6 @@
 import Foundation
 
-public struct BusRoute: Decodable, Hashable, Identifiable {
+public struct BusRoute: Decodable, Hashable, Identifiable, Sendable {
     public var id: String {
         routeId
     }

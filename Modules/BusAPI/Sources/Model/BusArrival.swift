@@ -1,6 +1,6 @@
 import Foundation
 
-public struct BusArrival: Decodable, Hashable, Identifiable {
+public struct BusArrival: Decodable, Hashable, Identifiable, Sendable {
     public var id: String {
         "\(routeId)-\(nodeId)"
     }

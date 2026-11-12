@@ -1,6 +1,8 @@
 import CoreHaptics
 
-class HapticManager {
+/// Thread safety is handled by hand (UI state is only changed on main), and its
+/// framework callbacks arrive on their own threads, so it is not actor-bound.
+class HapticManager: @unchecked Sendable {
     // MARK: - Properties
 
     /// 싱글톤 객체
@@ -136,8 +138,9 @@ class HapticManager {
     func playHapticPattern(hapticEvents: [CHHapticEvent]) {
         // 메인 스레드에서 실행 보장
         guard Thread.isMainThread else {
+            nonisolated(unsafe) let events = hapticEvents // handed to main, not used here afterwards
             DispatchQueue.main.async { [weak self] in
-                self?.playHapticPattern(hapticEvents: hapticEvents)
+                self?.playHapticPattern(hapticEvents: events)
             }
             return
         }

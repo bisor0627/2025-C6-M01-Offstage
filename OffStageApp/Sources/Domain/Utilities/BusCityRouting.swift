@@ -3,6 +3,7 @@ import CoreLocation
 import Foundation
 
 /// Decides which bus API serves a place and which city code a stop belongs to.
+@MainActor
 enum BusCityRouting {
     static let seoul = CityCodeConverter.seoul
 

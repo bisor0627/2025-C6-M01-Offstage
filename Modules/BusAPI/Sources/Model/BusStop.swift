@@ -1,6 +1,6 @@
 import Foundation
 
-public struct BusStop: Decodable, Hashable, Identifiable {
+public struct BusStop: Decodable, Hashable, Identifiable, Sendable {
     public var id: String {
         nodeId
     }

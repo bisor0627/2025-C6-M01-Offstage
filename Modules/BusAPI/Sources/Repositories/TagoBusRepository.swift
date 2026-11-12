@@ -1,5 +1,6 @@
 import Foundation
 import Logging
+import Synchronization
 
 public final class TagoBusRepository: BusRepository {
     private let transport: RelayTransport
@@ -26,7 +27,7 @@ public final class TagoBusRepository: BusRepository {
     }
 
     /// 현재 선택된 도시 코드를 저장하는 프로퍼티
-    private var currentCityCode: Int?
+    private let currentCityCode = Mutex<Int?>(nil)
 
     public func searchStops(cityCode: String?, nodeName: String?, nodeNumber: String?) async throws -> [BusStop] {
         // 1. 직접 전달된 cityCode가 있으면 사용
@@ -38,7 +39,7 @@ public final class TagoBusRepository: BusRepository {
         }
 
         // 2. GPS로 얻은 currentCityCode가 있으면 사용 (지역 제한 검색)
-        if let currentCityCode {
+        if let currentCityCode = currentCityCode.withLock({ $0 }) {
             logger.info("Using GPS-based city code for local search: \(currentCityCode)")
             return try await items(
                 for: .stopSearch(cityCode: String(currentCityCode), nodeName: nodeName, nodeNumber: nodeNumber),
@@ -57,7 +58,7 @@ public final class TagoBusRepository: BusRepository {
 
         // GPS 검색으로 얻은 첫 번째 정류장의 도시 코드를 저장
         if let firstStop = stops.first, let cityCode = firstStop.cityCode {
-            currentCityCode = cityCode
+            currentCityCode.withLock { $0 = cityCode }
             logger.info("Updated current city code from GPS search: \(cityCode)")
         }
 

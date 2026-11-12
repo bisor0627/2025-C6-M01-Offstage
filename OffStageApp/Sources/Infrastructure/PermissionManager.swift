@@ -31,8 +31,10 @@ enum PermissionType: String, CaseIterable {
 // MARK: - Permission Manager
 
 /// 각종 시스템 권한(알림, 위치, 카메라, 마이크, 음성인식)을 한 번에 요청하는 클래스
+/// Thread safety is handled by hand (UI state is only changed on main), and its
+/// framework callbacks arrive on their own threads, so it is not actor-bound.
 @Observable
-final class PermissionManager: NSObject {
+final class PermissionManager: NSObject, @unchecked Sendable {
     /// CLLocationManager 인스턴스 (위치 권한 요청용)
     private var locationManager: CLLocationManager?
     /// 위치 권한 요청 시 async/await 비동기 처리를 위한 continuation 저장소

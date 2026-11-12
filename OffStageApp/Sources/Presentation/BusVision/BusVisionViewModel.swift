@@ -3,6 +3,7 @@ import Combine
 import Foundation
 import Observation
 
+@MainActor
 @Observable
 class BusVisionViewModel {
     // MARK: - Properties
@@ -37,7 +38,8 @@ class BusVisionViewModel {
     var tiltManager: TiltManager
 
     private var cancellables = Set<AnyCancellable>()
-    private var detectingHapticTimer: Timer?
+    /// Invalidated from deinit, so it lives outside main-actor observation.
+    @ObservationIgnored private nonisolated(unsafe) var detectingHapticTimer: Timer?
     private var shouldPlayDetectingHaptic: Bool = true
 
     // MARK: - init
@@ -64,8 +66,8 @@ class BusVisionViewModel {
     }
 
     deinit {
-        alertManager.stopTracking()
-        stopDetectingFeedback()
+        // alertManager stops its own timer when it is released with this view model.
+        detectingHapticTimer?.invalidate()
     }
 }
 
@@ -125,8 +127,10 @@ extension BusVisionViewModel {
 
     private func startDetectingFeedback() {
         detectingHapticTimer = Timer.scheduledTimer(withTimeInterval: 1.5, repeats: true, block: { [weak self] _ in
-            guard let self, shouldPlayDetectingHaptic else { return }
-            hapticManager.playHapticsFile(named: "Waiting")
+            MainActor.assumeIsolated {
+                guard let self, self.shouldPlayDetectingHaptic else { return }
+                self.hapticManager.playHapticsFile(named: "Waiting")
+            }
         })
     }
 

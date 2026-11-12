@@ -6,35 +6,66 @@ private struct OCRResult {
     let isMyBus: Bool
 }
 
+/// One frame's OCR results, filled from OCR callbacks and read on main once they all finish.
+private final class FrameOCRResults: @unchecked Sendable {
+    let predictions: [VNRecognizedObjectObservation]
+    private let queue = DispatchQueue(label: "com.busvision.ocrResults")
+    private var collected: [OCRResult] = []
+
+    init(predictions: [VNRecognizedObjectObservation]) {
+        self.predictions = predictions
+    }
+
+    func append(_ result: OCRResult) {
+        queue.sync { collected.append(result) }
+    }
+
+    var results: [OCRResult] {
+        queue.sync { collected }
+    }
+}
+
 /// BusDetectionViewController + DetectionProcessing
 extension BusDetectionViewController {
     /// AI 모델 결과 처리
-    func handleVisionResults(_ request: VNRequest, error _: Error?) {
+    /// Runs on the capture queue; anything touching UIKit or the status callback hops to main.
+    nonisolated func handleVisionResults(_ request: VNRequest, error _: Error?) {
         guard let predictions = request.results as? [VNRecognizedObjectObservation]
         else {
-            onDetectedStatusChanged?(.unDetected)
-            drawingBoxesView?.drawBox(with: [])
+            DispatchQueue.main.async {
+                MainActor.assumeIsolated {
+                    self.onDetectedStatusChanged?(.unDetected)
+                    self.drawingBoxesView?.drawBox(with: [])
+                }
+            }
             return
         }
 
-        drawingBoxesView?.drawBox(with: [])
-        #if DEBUG_MODE
-            tempStrokeBoxesView?.drawBox(with: [])
-        #endif
+        DispatchQueue.main.async {
+            MainActor.assumeIsolated {
+                self.drawingBoxesView?.drawBox(with: [])
+                #if DEBUG_MODE
+                    self.tempStrokeBoxesView?.drawBox(with: [])
+                #endif
+            }
+        }
 
         let highConfidencePredictions = predictions.filter { $0.confidence >= 0.8 }
         guard !highConfidencePredictions.isEmpty else {
-            onDetectedStatusChanged?(.unDetected)
+            DispatchQueue.main.async {
+                MainActor.assumeIsolated {
+                    self.onDetectedStatusChanged?(.unDetected)
+                }
+            }
             return
         }
 
         performOCRAndUpdateStatus(on: highConfidencePredictions)
     }
 
-    private func performOCRAndUpdateStatus(on predictions: [VNRecognizedObjectObservation]) {
+    private nonisolated func performOCRAndUpdateStatus(on predictions: [VNRecognizedObjectObservation]) {
         let ocrGroup = DispatchGroup()
-        let ocrResultQueue = DispatchQueue(label: "com.busvision.ocrResults")
-        var ocrResults: [OCRResult] = []
+        let frame = FrameOCRResults(predictions: predictions)
 
         for prediction in predictions {
             // 이미지 영역 정하기
@@ -65,23 +96,23 @@ extension BusDetectionViewController {
                     routeNumber: self.routeNumberToDetect
                 )
 
-                ocrResultQueue.sync {
-                    ocrResults.append(
-                        OCRResult(
-                            prediction: prediction,
-                            isMyBus: isMyBus
-                        )
+                frame.append(
+                    OCRResult(
+                        prediction: prediction,
+                        isMyBus: isMyBus
                     )
-                }
+                )
             }
         }
 
         // 한 프레임의 prediction이 끝나면 한 번에 처리
         ocrGroup.notify(queue: .main) {
-            self.updateDetectionStatus(
-                with: ocrResults,
-                from: predictions
-            )
+            MainActor.assumeIsolated {
+                self.updateDetectionStatus(
+                    with: frame.results,
+                    from: frame.predictions
+                )
+            }
         }
     }
 

@@ -56,8 +56,11 @@ import SwiftUI
             tapCount += 1
 
             tapTimer?.invalidate()
+            let tapCountBinding = $tapCount
             tapTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { _ in
-                tapCount = 0
+                MainActor.assumeIsolated {
+                    tapCountBinding.wrappedValue = 0
+                }
             }
 
             if tapCount >= 5 {

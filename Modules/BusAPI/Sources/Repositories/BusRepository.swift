@@ -1,6 +1,6 @@
 import Foundation
 
-public protocol BusRepository {
+public protocol BusRepository: Sendable {
     /**
      특정 버스 API 서비스에서 지원하는 도시 목록을 가져옵니다.
      - Parameter service: 도시 목록을 조회할 버스 API 서비스 (예: TAGO, Seoul).

@@ -23,7 +23,9 @@ public protocol LocationProviding {
     func stopBackgroundLocationUpdates()
 
     /// GPS 좌표를 주소(CLPlacemark)로 변환합니다.
-    func fetchPlacemark(from location: CLLocationCoordinate2D) async throws -> CLPlacemark?
+    // nonisolated(nonsending): runs on the caller's actor, so main-actor view models can call it
+    // without sending the provider elsewhere.
+    nonisolated(nonsending) func fetchPlacemark(from location: CLLocationCoordinate2D) async throws -> CLPlacemark?
 
-    func requestLocation() async throws -> CLLocationCoordinate2D
+    nonisolated(nonsending) func requestLocation() async throws -> CLLocationCoordinate2D
 }

@@ -65,6 +65,9 @@ let busAPITests = Target.target(
     ]
 )
 
+/// Swift 6 language mode: data races are compile errors.
+let swiftSettings: SettingsDictionary = ["SWIFT_VERSION": "6.0"]
+
 let configurations: [Configuration] = [
     .debug(name: "Debug-Dev", xcconfig: .relativeToRoot("Config/Dev.xcconfig")),
     .release(name: "Release-Dev", xcconfig: .relativeToRoot("Config/Dev.xcconfig")),
@@ -85,10 +88,10 @@ let app = Target.target(
     dependencies: [
         .target(name: "BusAPI"),
     ],
-    settings: .settings(configurations: configurations)
+    settings: .settings(base: swiftSettings, configurations: configurations)
 )
 
-let settings = Settings.settings(configurations: configurations)
+let settings = Settings.settings(base: swiftSettings, configurations: configurations)
 
 let project = Project(
     name: "버스온다",

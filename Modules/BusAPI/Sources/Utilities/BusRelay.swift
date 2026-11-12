@@ -1,7 +1,7 @@
 import Foundation
 
 /// The TAGO services the app calls; each one has its own city-code list.
-public enum BusAPIService: CaseIterable {
+public enum BusAPIService: CaseIterable, Sendable {
     case location
     case stop
     case route

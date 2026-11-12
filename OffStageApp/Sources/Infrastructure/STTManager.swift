@@ -5,8 +5,10 @@ import Foundation
 import Observation
 import Speech // SFSpeechRecognizer 등 음성 인식 API
 
+/// Thread safety is handled by hand (UI state is only changed on main), and its
+/// framework callbacks arrive on their own threads, so it is not actor-bound.
 @Observable
-final class STTManager: NSObject {
+final class STTManager: NSObject, @unchecked Sendable {
     // MARK: - 외부(UI)에서 관찰할 상태 값
 
     var transcript: String = "" // 실시간 인식 결과 텍스트
@@ -63,7 +65,8 @@ final class STTManager: NSObject {
 
     // MARK: 음성이 끝난 것을 인식
 
-    func listenUntilFinalResult() async -> String? {
+    /// Runs on the caller's actor (nonisolated(nonsending)), so the main-actor sheet can await it.
+    nonisolated(nonsending) func listenUntilFinalResult() async -> String? {
         await withCheckedContinuation { continuation in
             finalResultContinuation = continuation
             startListening()
@@ -97,8 +100,9 @@ final class STTManager: NSObject {
             if let result {
                 // bestTranscription: 현재까지 인식된 최적의 문장
                 // UI 업데이트는 메인 스레드에서
+                let text = result.bestTranscription.formattedString
                 DispatchQueue.main.async {
-                    self.transcript = result.bestTranscription.formattedString
+                    self.transcript = text
                     print("[STT] transcript:", self.transcript)
                 }
 
