@@ -1,9 +1,8 @@
 // Modules/BusAPI/Sources/Network/SeoulBusAPITarget.swift
 import Foundation
-import Moya
 
 ///
-public enum SeoulBusAPITarget {
+public enum SeoulBusAPITarget: Sendable {
     /// 1. 정류소 이름 검색 (getStationByName)
     case getStationByName(name: String)
     /// 2. 정류소 좌표 검색 (getStationByPos) - TM 좌표
@@ -24,7 +23,7 @@ public enum SeoulBusAPITarget {
     case getBusPosByRtid(busRouteId: String)
 }
 
-extension SeoulBusAPITarget: TargetType {
+extension SeoulBusAPITarget: RelayRequest {
     /// 서울 버스 API through the relay, which adds the service key and calls it over http.
     public var baseURL: URL {
         BusRelay.baseURL.appendingPathComponent("v1/seoul")
@@ -44,13 +43,9 @@ extension SeoulBusAPITarget: TargetType {
         }
     }
 
-    public var method: Moya.Method {
-        .get
-    }
-
-    public var task: Task {
+    public var queryItems: [URLQueryItem] {
         // 1. resultType=json은 공통 파라미터입니다. serviceKey는 relay가 붙입니다.
-        var params: [String: Any] = [
+        var params: [String: (any Sendable)?] = [
             "resultType": "json",
         ]
 
@@ -81,14 +76,6 @@ extension SeoulBusAPITarget: TargetType {
             params["busRouteId"] = busRouteId
         }
 
-        return .requestParameters(parameters: params, encoding: URLEncoding.queryString)
-    }
-
-    public var headers: [String: String]? {
-        nil
-    }
-
-    public var sampleData: Data {
-        Data()
+        return makeQueryItems(params)
     }
 }

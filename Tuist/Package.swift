@@ -20,12 +20,8 @@ import PackageDescription
     let packageSettings = PackageSettings(
         productTypes: [
             // (권장) 안정적인 빌드를 위해 동적 프레임워크로 강제
-            "Moya": .framework,
             "Logging": .framework,
             "GRDB": .framework,
-            "Alamofire": .framework,
-            "RxSwift": .framework,
-            "ReactiveSwift": .framework,
         ],
 
         // 3. (핵심) 모든 SPM 의존성들이
@@ -41,7 +37,6 @@ import PackageDescription
 let package = Package(
     name: "OffStageApp",
     dependencies: [
-        .package(url: "https://github.com/Moya/Moya.git", from: "15.0.0"),
         .package(url: "https://github.com/apple/swift-log.git", from: "1.0.0"),
         .package(url: "https://github.com/groue/GRDB.swift.git", from: "6.25.0"),
     ]

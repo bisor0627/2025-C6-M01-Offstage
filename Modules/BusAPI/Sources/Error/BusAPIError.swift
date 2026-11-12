@@ -1,5 +1,4 @@
 import Foundation
-import Moya
 
 /// Errors thrown by the Bus API module.
 public enum BusAPIError: Error {
@@ -13,8 +12,8 @@ public enum BusAPIError: Error {
     case noResults
     /// Thrown when decoding the response payload fails.
     case decodingFailed(Error)
-    /// Thrown when the underlying Moya request fails.
-    case network(MoyaError)
+    /// Thrown when the request could not reach the relay (URLError etc.).
+    case network(any Error)
     /// Thrown when the relay refuses this device for a minute (HTTP 429).
     case rateLimited
     /// Thrown when the relay has used today's upstream quota (HTTP 503).

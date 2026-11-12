@@ -1,32 +1,29 @@
 import Foundation
 import Logging
-import Moya
 
 public final class SeoulBusRepository: BusRepository {
-    private let provider: MoyaProvider<SeoulBusAPITarget>
+    private let transport: RelayTransport
     private let decoder: JSONDecoder
     private let logger = Logger(label: "BusAPI.SeoulBusRepository")
 
-    public init(provider: MoyaProvider<SeoulBusAPITarget>? = nil, decoder: JSONDecoder = JSONDecoder()) {
-        if let provider {
-            self.provider = provider
-        } else {
-            // 디버그 빌드에서만 NetworkLoggerPlugin으로 요청·응답 전체를 로깅합니다.
-            #if DEBUG
-                self.provider = MoyaProvider<SeoulBusAPITarget>(plugins: [NetworkLoggerPlugin()])
-            #else
-                self.provider = MoyaProvider<SeoulBusAPITarget>()
-            #endif
-        }
+    public init(transport: RelayTransport = URLSessionTransport(), decoder: JSONDecoder = JSONDecoder()) {
+        self.transport = transport
         self.decoder = decoder
     }
 
-    /// Sends a request and turns relay refusals (429/502/503) into `BusAPIError`.
-    private func request(_ target: SeoulBusAPITarget) async throws -> Response {
-        let response = try await provider.request(target)
-        if let relayError = BusAPIError(relayStatus: response.statusCode) {
-            throw relayError
-        }
+    /// Sends a request through the relay; relay refusals arrive as `BusAPIError`.
+    private func request(_ target: SeoulBusAPITarget) async throws -> RelayResponse {
+        logger.info("➡️ Request: \(target.path)")
+        let response = try await transport.response(for: target)
+        // Bodies only in debug builds: arrivals are polled every few seconds.
+        #if DEBUG
+            logger
+                .info(
+                    "⬅️ Response: \(target.path) status: \(response.statusCode)\n\(String(decoding: response.data, as: UTF8.self))"
+                )
+        #else
+            logger.info("⬅️ Response: \(target.path) status: \(response.statusCode) (\(response.data.count) bytes)")
+        #endif
         return response
     }
 

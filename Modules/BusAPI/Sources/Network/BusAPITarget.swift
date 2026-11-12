@@ -1,7 +1,6 @@
 import Foundation
-import Moya
 
-public struct BusAPITarget: TargetType {
+public struct BusAPITarget: RelayRequest {
     public let endpoint: Endpoint
 
     public init(_ endpoint: Endpoint) {
@@ -17,27 +16,13 @@ public struct BusAPITarget: TargetType {
         endpoint.path
     }
 
-    public var method: Moya.Method {
-        .get
-    }
-
-    public var sampleData: Data {
-        Data()
-    }
-
-    public var task: Moya.Task {
-        var parameters = endpoint.parameters
-        parameters["_type"] = "json"
-        return .requestParameters(parameters: parameters, encoding: URLEncoding.queryString)
-    }
-
-    public var headers: [String: String]? {
-        ["Content-Type": "application/json"]
+    public var queryItems: [URLQueryItem] {
+        makeQueryItems(endpoint.parameters) + [URLQueryItem(name: "_type", value: "json")]
     }
 }
 
 public extension BusAPITarget {
-    enum Endpoint {
+    enum Endpoint: Sendable {
         case cityCodes(service: BusAPIService)
         case routeLocations(cityCode: String, routeId: String, page: Int? = nil, rows: Int? = nil)
         case stopSearch(cityCode: String, nodeName: String?, nodeNumber: String?)
@@ -98,8 +83,8 @@ public extension BusAPITarget {
             }
         }
 
-        var parameters: [String: Any] {
-            let sanitized: [String: Any?] = switch self {
+        var parameters: [String: (any Sendable)?] {
+            switch self {
             case .cityCodes:
                 [:]
             case let .routeLocations(cityCode, routeId, page, rows):
@@ -157,7 +142,6 @@ public extension BusAPITarget {
                     "routeId": routeId,
                 ]
             }
-            return sanitized.compactMapValues { $0 }
         }
     }
 }

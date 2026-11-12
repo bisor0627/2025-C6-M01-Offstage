@@ -1,17 +1,16 @@
 import Foundation
 import Logging
-import Moya
 
 public final class TagoBusRepository: BusRepository {
-    private let provider: MoyaProvider<BusAPITarget>
+    private let transport: RelayTransport
     private let decoder: JSONDecoder
     private let logger = Logger(label: "BusAPI.TagoBusRepository")
 
     public init(
-        provider: MoyaProvider<BusAPITarget>? = nil,
+        transport: RelayTransport = URLSessionTransport(),
         decoder: JSONDecoder = JSONDecoder()
     ) {
-        self.provider = provider ?? MoyaProvider<BusAPITarget>()
+        self.transport = transport
         self.decoder = decoder
     }
 
@@ -103,17 +102,8 @@ public final class TagoBusRepository: BusRepository {
     private func fetch<Item: Decodable>(endpoint: BusAPITarget.Endpoint) async throws -> BusAPIEnvelope<Item> {
         let target = BusAPITarget(endpoint)
 
-        let response: Response
-        do {
-            logger.info("➡️ Request: \(target.path) params: \(endpoint.parameters)")
-            response = try await provider.request(target)
-        } catch let error as MoyaError {
-            throw BusAPIError.network(error)
-        }
-
-        if let relayError = BusAPIError(relayStatus: response.statusCode) {
-            throw relayError
-        }
+        logger.info("➡️ Request: \(target.path) params: \(endpoint.parameters.compactMapValues { $0 })")
+        let response = try await transport.response(for: target)
 
         guard !response.data.isEmpty else {
             throw BusAPIError.emptyBody

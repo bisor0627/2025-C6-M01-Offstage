@@ -48,7 +48,6 @@ let busAPI = Target.target(
     infoPlist: .extendingDefault(with: baseInfoPlist),
     sources: ["Modules/BusAPI/Sources/**"],
     dependencies: [
-        .external(name: "Moya"),
         .external(name: "Logging"),
     ]
 )
