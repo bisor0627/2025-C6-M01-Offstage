@@ -60,9 +60,11 @@ platform :ios do
 
   desc 'Upload 1.0.4 "What\'s New" and review notes only (no screenshots, never submits)'
   lane :metadata do
+    key = api_key
     deliver(
-      api_key: api_key,
+      api_key: key,
       app_version: '1.0.4',
+      app_review_information: review_information(versions: ['1.0.4', '1.0.3']),
       skip_binary_upload: true,
       skip_screenshots: true,
       submit_for_review: false,
@@ -70,5 +72,29 @@ platform :ios do
       precheck_include_in_app_purchases: false,
       run_precheck_before_submit: false
     )
+  end
+
+  # App Store Connect now wants +<country code>; older versions kept Korean local numbers (010...).
+  def international_phone(phone)
+    digits = phone.to_s.gsub(/\D/, '')
+    return "+#{digits}" if phone.to_s.strip.start_with?('+')
+    digits.start_with?('0') ? "+82 #{digits[1..]}" : "+#{digits}"
+  end
+
+  # Review contact details are copied from an approved version at run time, so no
+  # personal data lives in the repo; only the notes come from review_notes.txt.
+  def review_information(versions:)
+    app = Spaceship::ConnectAPI::App.find(CredentialsManager::AppfileConfig.try_fetch_value(:app_identifier))
+    details = versions.filter_map { |v| app.get_app_store_versions.find { |x| x.version_string == v }&.fetch_app_store_review_detail }
+    detail = details.find { |d| !d.contact_phone.to_s.strip.empty? }
+    UI.user_error!("No review contact phone on #{versions.join('/')}: fill 앱 심사 정보 > 연락처 once in App Store Connect") unless detail
+    {
+      first_name: detail.contact_first_name,
+      last_name: detail.contact_last_name,
+      phone_number: international_phone(detail.contact_phone),
+      email_address: detail.contact_email,
+      demo_required: false,
+      notes: File.read(File.expand_path('review_notes.txt', __dir__))
+    }
   end
 end
