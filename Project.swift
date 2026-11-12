@@ -53,6 +53,19 @@ let busAPI = Target.target(
     ]
 )
 
+let busAPITests = Target.target(
+    name: "BusAPITests",
+    destinations: [.iPhone],
+    product: .unitTests,
+    bundleId: "\(organizationName).BusAPITests",
+    deploymentTargets: deploymentTargets,
+    infoPlist: .default,
+    sources: ["Modules/BusAPI/Tests/**"],
+    dependencies: [
+        .target(name: "BusAPI"),
+    ]
+)
+
 let configurations: [Configuration] = [
     .debug(name: "Debug-Dev", xcconfig: .relativeToRoot("Config/Dev.xcconfig")),
     .release(name: "Release-Dev", xcconfig: .relativeToRoot("Config/Dev.xcconfig")),
@@ -82,7 +95,7 @@ let settings = Settings.settings(configurations: configurations)
 let project = Project(
     name: "버스온다",
     settings: settings,
-    targets: [busAPI, app],
+    targets: [busAPI, busAPITests, app],
     schemes: [
         .scheme(
             name: "버스온다 (Dev)",
@@ -93,6 +106,7 @@ let project = Project(
         .scheme(
             name: "버스온다",
             buildAction: .buildAction(targets: ["버스온다"]),
+            testAction: .targets(["BusAPITests"], configuration: .configuration("Debug-Prod")),
             runAction: .runAction(configuration: .configuration("Debug-Prod")),
             archiveAction: .archiveAction(configuration: .configuration("Release-Prod"))
         ),
