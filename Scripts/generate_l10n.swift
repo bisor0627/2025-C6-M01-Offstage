@@ -45,7 +45,7 @@ enum ScriptError: Error {
     case parsingError(String)
 }
 
-// 1. Read and Parse CSV
+/// 1. Read and Parse CSV
 func parseCSV(path: String) throws -> [StringEntry] {
     let content: String
     do {
@@ -112,7 +112,7 @@ func parseCSV(path: String) throws -> [StringEntry] {
     return entries
 }
 
-// 2. Generate Localizable.xcstrings Content (JSON)
+/// 2. Generate Localizable.xcstrings Content (JSON)
 func generateXcstringsJSON(entries: [StringEntry]) throws -> String {
     var stringsDict = [String: StringItem]()
     for entry in entries {
@@ -140,7 +140,7 @@ func generateXcstringsJSON(entries: [StringEntry]) throws -> String {
     return jsonString
 }
 
-// 3. Generate L10n.swift Content (Enum Manager)
+/// 3. Generate L10n.swift Content (Enum Manager)
 func generateSwiftManager(entries: [StringEntry]) -> String {
     var swiftContent = """
     import SwiftUI
@@ -170,7 +170,9 @@ func generateSwiftManager(entries: [StringEntry]) -> String {
             if components.count < 3 {
                 let propertyName = components.dropFirst().joined(separator: ".").prefix(1).lowercased() + components
                     .dropFirst().joined(separator: ".").dropFirst()
-                if propertyName.isEmpty { continue }
+                if propertyName.isEmpty {
+                    continue
+                }
                 swiftContent += "\n        /// \"\(entry.value.replacingOccurrences(of: "\n", with: " "))\" (문맥: \(entry.comment))\n"
                 swiftContent += "        static let \(propertyName) = key(\"\(entry.key)\")\n"
             } else {
@@ -194,7 +196,9 @@ func generateSwiftManager(entries: [StringEntry]) -> String {
                     }
                     .joined()
 
-                if propertyName.isEmpty { continue }
+                if propertyName.isEmpty {
+                    continue
+                }
 
                 swiftContent += "\n            /// \"\(entry.value.replacingOccurrences(of: "\n", with: " "))\" (문맥: \(entry.comment))\n"
                 swiftContent += "            static let \(propertyName) = key(\"\(entry.key)\")\n"
@@ -207,7 +211,7 @@ func generateSwiftManager(entries: [StringEntry]) -> String {
     return swiftContent
 }
 
-// --- Main Execution ---
+/// --- Main Execution ---
 func main() {
     do {
         print("스크립트 실행...")

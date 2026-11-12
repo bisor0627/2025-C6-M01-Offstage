@@ -12,7 +12,9 @@ final class BusStopSelectionViewModel: ObservableObject {
         let stop: BusStop
         let distance: Double // 미터 단위
 
-        var id: String { stop.nodeId }
+        var id: String {
+            stop.nodeId
+        }
     }
 
     // MARK: - Published Properties
@@ -43,8 +45,7 @@ final class BusStopSelectionViewModel: ObservableObject {
         guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
             throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
         }
-        let detectedCityCode = CityCodeConverter.findCode(from: placemark) ?? "31020"
-        return detectedCityCode
+        return CityCodeConverter.findCode(from: placemark) ?? "31020"
     }
 
     /// 두 좌표 간의 거리를 계산 (미터 단위)

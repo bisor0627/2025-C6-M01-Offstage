@@ -2,7 +2,7 @@
 import Foundation
 import Moya
 
-//
+///
 public enum SeoulBusAPITarget {
     /// 1. 정류소 이름 검색 (getStationByName)
     case getStationByName(name: String)
@@ -24,7 +24,9 @@ public enum SeoulBusAPITarget {
 
 extension SeoulBusAPITarget: TargetType {
     /// 서울 버스 API through the relay, which adds the service key and calls it over http.
-    public var baseURL: URL { BusRelay.baseURL.appendingPathComponent("v1/seoul") }
+    public var baseURL: URL {
+        BusRelay.baseURL.appendingPathComponent("v1/seoul")
+    }
 
     public var path: String {
         switch self {
@@ -39,7 +41,9 @@ extension SeoulBusAPITarget: TargetType {
         }
     }
 
-    public var method: Moya.Method { .get }
+    public var method: Moya.Method {
+        .get
+    }
 
     public var task: Task {
         // 1. resultType=json은 공통 파라미터입니다. serviceKey는 relay가 붙입니다.
@@ -75,6 +79,11 @@ extension SeoulBusAPITarget: TargetType {
         return .requestParameters(parameters: params, encoding: URLEncoding.queryString)
     }
 
-    public var headers: [String: String]? { nil }
-    public var sampleData: Data { Data() }
+    public var headers: [String: String]? {
+        nil
+    }
+
+    public var sampleData: Data {
+        Data()
+    }
 }

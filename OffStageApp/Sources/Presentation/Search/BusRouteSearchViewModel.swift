@@ -49,7 +49,9 @@ final class BusRouteSearchViewModel: ObservableObject {
                     break
                 }
 
-                if Task.isCancelled { break }
+                if Task.isCancelled {
+                    break
+                }
 
                 await fetchBusRoutes()
             }
@@ -112,7 +114,6 @@ final class BusRouteSearchViewModel: ObservableObject {
         guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
             throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
         }
-        let detectedCityCode = CityCodeConverter.findCode(from: placemark) ?? "31020"
-        return detectedCityCode
+        return CityCodeConverter.findCode(from: placemark) ?? "31020"
     }
 }

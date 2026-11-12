@@ -129,7 +129,6 @@ struct BusRouteSearchView: View {
         .padding(.bottom, 18)
     }
 
-    @ViewBuilder
     private func loadingContent() -> some View {
         VStack {
             ProgressView()
@@ -145,7 +144,6 @@ struct BusRouteSearchView: View {
         .accessibilityElement(children: .combine)
     }
 
-    @ViewBuilder
     private func busRouteListContent(routes: [BusRouteWithArrival], filterState: FilterState) -> some View {
         VStack {
             Rectangle()
@@ -216,7 +214,6 @@ struct BusRouteSearchView: View {
         .padding(.bottom, 40)
     }
 
-    @ViewBuilder
     private func titleText(for filterState: FilterState) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             switch filterState {
@@ -269,7 +266,6 @@ struct BusRouteSearchView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    @ViewBuilder
     private func busRouteRow(routeWithArrival: BusRouteWithArrival) -> some View {
         Button(action: {
             print("Selected bus route: \(routeWithArrival.route.routeNumber)")
@@ -347,7 +343,6 @@ struct BusRouteSearchView: View {
         .accessibilityElement(children: .combine)
     }
 
-    @ViewBuilder
     private func emptyContent() -> some View {
         VStack {
             Image(systemName: "bus")

@@ -16,7 +16,7 @@ final class LocationManager: NSObject, LocationProviding {
 
     lazy var currentLocation: AnyPublisher<CLLocationCoordinate2D, Error> = subject.eraseToAnyPublisher()
 
-    // [추가] Reverse Geocoding을 위한 지오코더
+    /// [추가] Reverse Geocoding을 위한 지오코더
     private let geocoder = CLGeocoder()
 
     #if DEBUG_MODE

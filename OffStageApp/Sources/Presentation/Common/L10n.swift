@@ -241,7 +241,7 @@ enum L10n {
         }
     }
 
-    // Accessibility-only formats for BusArrival screens
+    /// Accessibility-only formats for BusArrival screens
     enum BusArrival {
         enum A11y {
             enum Format {

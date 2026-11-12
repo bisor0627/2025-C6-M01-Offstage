@@ -1,8 +1,7 @@
+import BusAPI
 import Combine
 import CoreLocation
 import Foundation
-
-import BusAPI
 
 @MainActor
 final class HomeViewModel: ObservableObject {
@@ -30,8 +29,7 @@ final class HomeViewModel: ObservableObject {
         guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
             throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
         }
-        let detectedCityCode = CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
-        return detectedCityCode
+        return CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
     }
 
     func fetchNearestStop() {

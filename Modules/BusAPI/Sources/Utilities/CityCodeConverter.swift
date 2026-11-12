@@ -167,17 +167,13 @@ public enum CityCodeConverter {
     /// 서울은 "1000", 그 외 지역은 `nil`을 반환합니다.
     public static func findCode(from placemark: CLPlacemark) -> String? {
         // 1. Try to find a direct match using locality
-        if let locality = placemark.locality {
-            if let code = cityCodeMap[locality] {
-                return code
-            }
+        if let locality = placemark.locality, let code = cityCodeMap[locality] {
+            return code
         }
 
         // 2. If not found, try to find a direct match using administrativeArea
-        if let administrativeArea = placemark.administrativeArea {
-            if let code = cityCodeMap[administrativeArea] {
-                return code
-            }
+        if let administrativeArea = placemark.administrativeArea, let code = cityCodeMap[administrativeArea] {
+            return code
         }
 
         // 3. If still not found, try matching against components of combined city names

@@ -12,7 +12,7 @@ struct BusVisionView: View {
     @EnvironmentObject var router: Router<AppRoute>
     @State var showHelpSheet: Bool = false
 
-    // init
+    /// init
     init(busStop: BusStop, busRoute: BusRoute) {
         self.busStop = busStop
         self.busRoute = busRoute

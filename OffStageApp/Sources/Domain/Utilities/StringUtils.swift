@@ -14,8 +14,12 @@ extension String {
         let sCount = s.count
         let tCount = t.count
 
-        if sCount == 0 { return tCount }
-        if tCount == 0 { return sCount }
+        if sCount == 0 {
+            return tCount
+        }
+        if tCount == 0 {
+            return sCount
+        }
 
         var dist = [[Int]](repeating: [Int](repeating: 0, count: tCount + 1), count: sCount + 1)
 

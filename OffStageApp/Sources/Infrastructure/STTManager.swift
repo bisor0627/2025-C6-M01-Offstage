@@ -14,15 +14,15 @@ final class STTManager: NSObject, ObservableObject {
 
     // 인식기: 언어를 한국어("ko-KR")로 지정.
     private let recognizer = SFSpeechRecognizer(locale: Locale(identifier: "ko-KR"))
-    // 마이크 입력을 다루는 오디오 엔진. installTap으로 버퍼를 받아온다.
+    /// 마이크 입력을 다루는 오디오 엔진. installTap으로 버퍼를 받아온다.
     private let audioEngine = AVAudioEngine()
-    // 인식기에게 "지금부터 오디오 스트림 들어간다"라고 전달하는 요청 객체(스트리밍)
+    /// 인식기에게 "지금부터 오디오 스트림 들어간다"라고 전달하는 요청 객체(스트리밍)
     private var request: SFSpeechAudioBufferRecognitionRequest?
     // 실제 인식 작업(콜백으로 부분/최종 결과, 오류를 받는다)
     private var recognitionTask: SFSpeechRecognitionTask?
     private var finalResultContinuation: CheckedContinuation<String?, Never>?
 
-    // 발화 상태 추적용
+    /// 발화 상태 추적용
     private enum ListeningState {
         case waitingForSpeech
         case trackingSpeech(peak: Float)
@@ -198,9 +198,11 @@ final class STTManager: NSObject, ObservableObject {
         finalResultContinuation = nil
     }
 
-    // 1초 무음 대기 로직
+    /// 1초 무음 대기 로직
     private func scheduleSilenceTimeout() {
-        if silenceTimerTask != nil { return }
+        if silenceTimerTask != nil {
+            return
+        }
         print("[STT] silence candidate, start 1s timer")
         silenceTimerTask = Task { [weak self] in
             try? await Task.sleep(for: .seconds(1))
@@ -220,7 +222,7 @@ final class STTManager: NSObject, ObservableObject {
         silenceTimerTask = nil
     }
 
-    // RMS 계산
+    /// RMS 계산
     private func rmsLevel(for buffer: AVAudioPCMBuffer) -> Float {
         guard let channelData = buffer.floatChannelData?.pointee else { return -100 }
         let frameLength = vDSP_Length(buffer.frameLength)

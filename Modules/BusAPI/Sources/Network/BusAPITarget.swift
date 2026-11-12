@@ -21,7 +21,9 @@ public struct BusAPITarget: TargetType {
         .get
     }
 
-    public var sampleData: Data { Data() }
+    public var sampleData: Data {
+        Data()
+    }
 
     public var task: Moya.Task {
         var parameters = endpoint.parameters

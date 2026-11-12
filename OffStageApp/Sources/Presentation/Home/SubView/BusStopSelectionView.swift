@@ -252,7 +252,7 @@ struct BusStopSelectionView: View {
         }
     }
 
-    // 거리 포맷 함수 추가
+    /// 거리 포맷 함수 추가
     private func formatDistance(_ meters: Double) -> String {
         if meters < 1000 {
             return "\(Int(meters))m"

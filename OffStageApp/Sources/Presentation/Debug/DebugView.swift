@@ -14,10 +14,10 @@
         @State private var overrideLatitude: String = "37.3918667"
         @State private var overrideLongitude: String = "127.1118833"
 
-        // Mock 데이터 사용 여부
+        /// Mock 데이터 사용 여부
         @State private var useMockData: Bool = AppSettings.useMockData
 
-        // 테스트용 버스 정류장 및 노선 정보
+        /// 테스트용 버스 정류장 및 노선 정보
         private let testBusStop = BusStop(
             nodeId: "GGB206000635",
             name: "판교역동편",

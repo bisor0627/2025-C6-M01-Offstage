@@ -16,13 +16,13 @@ class BusVisionViewModel: ObservableObject {
     /// 내 버스가 감지된 시간
     private var lastMineDetectedTime: Date?
 
-    // 곧도착알림
+    /// 곧도착알림
     var alertManager: BusVisionArrivalAlertManager
 
-    // 햅틱진동
+    /// 햅틱진동
     private var hapticManager = HapticManager.shared
 
-    // tts
+    /// tts
     private var ttsManager: TTSManager = .init()
 
     // 기울기

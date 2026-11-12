@@ -11,10 +11,4 @@ struct BusRouteWithArrival: Identifiable, Equatable {
         self.route = route
         self.arrival = arrival
     }
-
-    static func == (lhs: BusRouteWithArrival, rhs: BusRouteWithArrival) -> Bool {
-        lhs.id == rhs.id &&
-            lhs.route == rhs.route &&
-            lhs.arrival == rhs.arrival
-    }
 }

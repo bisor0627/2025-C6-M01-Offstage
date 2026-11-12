@@ -6,7 +6,7 @@ import Vision
 final class BusDetectionViewController: UIViewController {
     // MARK: Properties
 
-    // input properties
+    /// input properties
     /// 인식할 노선번호
     var routeNumberToDetect: String = ""
     /// 감지된 상태가 변경될 때 SwiftUI에서 처리하기 위한 클로저
@@ -18,7 +18,7 @@ final class BusDetectionViewController: UIViewController {
     private var hapticManager = HapticManager.shared
     private var ttsManager: TTSManager = .init()
 
-    // subviews
+    /// subviews
     var drawingBoxesView: DrawingBoxesView?
     #if DEBUG_MODE
         var tempStrokeBoxesView: TempStokeBoxesView?
@@ -83,11 +83,11 @@ final class BusDetectionViewController: UIViewController {
         session.sessionPreset = .hd1280x720
 
         guard let device = AVCaptureDevice.default(
-            .builtInWideAngleCamera,
-            for: .video,
-            position: .back
-        ),
-            let input = try? AVCaptureDeviceInput(device: device)
+                  .builtInWideAngleCamera,
+                  for: .video,
+                  position: .back
+              ),
+              let input = try? AVCaptureDeviceInput(device: device)
         else {
             print("Couldn't create video input")
             return

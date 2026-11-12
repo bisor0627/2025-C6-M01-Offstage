@@ -118,15 +118,15 @@ struct BusArrivalView: View {
                         busRoute: viewModel.busRoute,
                         currentEstimatedArrivalTime: viewModel.currentEstimatedArrivalTime
                     )
-                    /// - api 호출 주기 짧게 만든 후, 테스트 필요
-                    /// - 짧은 시간에 공지가 연속 게시되면 이전 멘트를 중단하고 새 멘트를 읽어 "문장이 씹히는" 현상이 발생함
+                    // - api 호출 주기 짧게 만든 후, 테스트 필요
+                    // - 짧은 시간에 공지가 연속 게시되면 이전 멘트를 중단하고 새 멘트를 읽어 "문장이 씹히는" 현상이 발생함
                     UIAccessibility.post(notification: .announcement, argument: announcement)
                 }
             }
         }
     }
 
-    // 버스 도착 정보 헬퍼 뷰
+    /// 버스 도착 정보 헬퍼 뷰
     struct BusArrivalInfoView: View {
         let routeWithArrival: BusRouteWithArrival
         let currentEstimatedArrivalTime: Int?
@@ -186,7 +186,7 @@ struct BusArrivalView: View {
         }
     }
 
-    // 버스 위치 정보 Helper View (Fallback)
+    /// 버스 위치 정보 Helper View (Fallback)
     struct BusLocationInfoView: View {
         let location: BusLocation
         let busRoute: BusRoute

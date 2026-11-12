@@ -1,7 +1,9 @@
 import Foundation
 
 public struct BusStop: Decodable, Hashable, Identifiable {
-    public var id: String { nodeId }
+    public var id: String {
+        nodeId
+    }
 
     public let nodeId: String
     public let name: String

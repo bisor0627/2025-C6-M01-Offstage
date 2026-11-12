@@ -13,7 +13,9 @@ public enum SeoulArrivalParser {
     /// - Returns: Result with seconds and remainingStops, or nil if message indicates no arrival (운행종료 등)
     public static func parse(_ msg: String) -> Result? {
         let trimmed = msg.trimmingCharacters(in: .whitespacesAndNewlines)
-        if trimmed.isEmpty { return nil }
+        if trimmed.isEmpty {
+            return nil
+        }
 
         // Common phrases
         if trimmed.contains("운행종료") || trimmed.contains("출발대기") {
@@ -26,23 +28,19 @@ public enum SeoulArrivalParser {
         }
 
         // 정규식으로 "NN분후" 추출
-        if let minuteMatch = matchFirst(in: trimmed, pattern: "([0-9]+)분후") {
-            if let minutes = Int(minuteMatch) {
-                let seconds = minutes * 60
-                // remaining stops: [X번째 전] 형태가 있으면 추출
-                var remaining: Int? = nil
-                if let remMatch = matchFirst(in: trimmed, pattern: "\\[([0-9]+)번째 전\\]") {
-                    remaining = Int(remMatch)
-                }
-                return Result(seconds: seconds, remainingStops: remaining)
+        if let minuteMatch = matchFirst(in: trimmed, pattern: "([0-9]+)분후"), let minutes = Int(minuteMatch) {
+            let seconds = minutes * 60
+            // remaining stops: [X번째 전] 형태가 있으면 추출
+            var remaining: Int? = nil
+            if let remMatch = matchFirst(in: trimmed, pattern: "\\[([0-9]+)번째 전\\]") {
+                remaining = Int(remMatch)
             }
+            return Result(seconds: seconds, remainingStops: remaining)
         }
 
         // 다른 패턴: 예를 들어 "약 1분 후" 등. 숫자만 추출해서 분으로 해석
-        if let numberMatch = matchFirst(in: trimmed, pattern: "([0-9]+)") {
-            if let num = Int(numberMatch) {
-                return Result(seconds: num * 60, remainingStops: nil)
-            }
+        if let numberMatch = matchFirst(in: trimmed, pattern: "([0-9]+)"), let num = Int(numberMatch) {
+            return Result(seconds: num * 60, remainingStops: nil)
         }
 
         return nil

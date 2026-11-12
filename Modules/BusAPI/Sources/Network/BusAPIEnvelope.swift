@@ -133,7 +133,9 @@ private struct Discardable: Decodable {
 
 private struct AnyCodingKey: CodingKey {
     var stringValue: String
-    init?(stringValue: String) { self.stringValue = stringValue }
+    init?(stringValue: String) {
+        self.stringValue = stringValue
+    }
 
     var intValue: Int?
     init?(intValue: Int) {

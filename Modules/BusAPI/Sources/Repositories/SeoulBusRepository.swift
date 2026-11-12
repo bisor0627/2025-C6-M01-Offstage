@@ -125,10 +125,9 @@ public final class SeoulBusRepository: BusRepository {
         let response = try await request(.getStationArrivals(arsId: nodeId))
         let body = try decoder.decode(SeoulArrivalResponse.self, from: response.data)
 
-        let arrivals = body.msgBody.itemList.flatMap { dto in
+        return body.msgBody.itemList.flatMap { dto in
             adaptToBusArrival(from: dto)
         }
-        return arrivals
     }
 
     public func fetchRouteArrivals(cityCode: String, nodeId: String, routeId: String) async throws -> [BusArrival] {

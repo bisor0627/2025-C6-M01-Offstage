@@ -2,7 +2,7 @@ import BusAPI
 import CoreLocation
 import Foundation
 
-// 도착 정보 조회 시 발생할 수 있는 결과들을 나타내는 열거형입니다.
+/// 도착 정보 조회 시 발생할 수 있는 결과들을 나타내는 열거형입니다.
 enum BusArrivalUpdate {
     case arrival(BusArrival)
     case location(BusLocation)
@@ -10,7 +10,7 @@ enum BusArrivalUpdate {
     case empty
 }
 
-// Operations 계층 패턴에 따라 버스 도착 정보 조회 및 모니터링을 위한 비즈니스 로직을 캡슐화한 클래스입니다.
+/// Operations 계층 패턴에 따라 버스 도착 정보 조회 및 모니터링을 위한 비즈니스 로직을 캡슐화한 클래스입니다.
 final class BusArrivalOperations {
     private let busRepository: BusRepository
     private let locationProvider: LocationProviding
@@ -23,13 +23,13 @@ final class BusArrivalOperations {
         self.locationProvider = locationProvider
     }
 
-    // 초기 데이터를 제공하고, 도착 예정 시간에 따라 동적으로 조정되는 간격으로 주기적 업데이트를 제공하는 스트림을 생성합니다.
+    /// 초기 데이터를 제공하고, 도착 예정 시간에 따라 동적으로 조정되는 간격으로 주기적 업데이트를 제공하는 스트림을 생성합니다.
     func monitorArrivals(busStop: BusStop, busRoute: BusRoute) -> AsyncStream<BusArrivalUpdate> {
         AsyncStream { continuation in
             var lastArrivalTime: Int? = nil
 
             let task = Task {
-                // 조회를 수행하고 결과를 전달하는 헬퍼 함수입니다.
+                /// 조회를 수행하고 결과를 전달하는 헬퍼 함수입니다.
                 func fetchAndYield() async {
                     do {
                         let arrivals = try await fetchArrivalsOnly(busStop: busStop, busRoute: busRoute)
@@ -68,7 +68,9 @@ final class BusArrivalOperations {
                         break
                     }
 
-                    if Task.isCancelled { break }
+                    if Task.isCancelled {
+                        break
+                    }
 
                     await fetchAndYield()
                 }

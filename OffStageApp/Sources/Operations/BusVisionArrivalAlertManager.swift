@@ -11,7 +11,7 @@ class BusVisionArrivalAlertManager: ObservableObject {
     @Published var remainingStops: Int = 0
     @Published var currentState: BusNotificationState = .waitingForArrival
 
-    // 알림 표시 상태 (View에서 이걸로 알림뷰 띄움)
+    /// 알림 표시 상태 (View에서 이걸로 알림뷰 띄움)
     @Published var showSoonArrivalAlert: Bool = false
 
     private var timer: Timer?

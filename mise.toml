@@ -1,9 +1,9 @@
 # --- 도구 버전 관리 ----------------------------------------------------------
 [tools]
-tuist = "latest"
-swiftlint = "latest"
-swiftformat = "latest"
-lefthook = "latest"
+tuist = "4.216.0"
+swiftlint = "0.65.1"
+swiftformat = "0.64.6"
+lefthook = "2.2.2"
 
 # --- 태스크(팀 표준 커맨드) ---------------------------------------------------
 [tasks]

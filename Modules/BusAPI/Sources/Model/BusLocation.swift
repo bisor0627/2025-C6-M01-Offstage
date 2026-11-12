@@ -1,7 +1,9 @@
 import Foundation
 
 public struct BusLocation: Decodable, Hashable, Identifiable {
-    public var id: String { "\(routeId)-\(vehicleNumber)" }
+    public var id: String {
+        "\(routeId)-\(vehicleNumber)"
+    }
 
     public let routeId: String
     public let routeNumber: String

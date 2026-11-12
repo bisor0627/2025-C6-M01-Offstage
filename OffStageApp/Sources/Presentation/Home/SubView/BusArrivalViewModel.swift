@@ -24,7 +24,7 @@ final class BusArrivalViewModel: ObservableObject {
     private var countdownTimer: Timer?
     private let hapticManager = HapticManager.shared
 
-    // Haptic 중복 방지 플래그
+    /// Haptic 중복 방지 플래그
     private var hasVibratedAtSecondStop = false
 
     // MARK: - 초기화

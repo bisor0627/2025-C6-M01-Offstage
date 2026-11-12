@@ -288,12 +288,10 @@ final class TestViewModel: ObservableObject {
                 } else {
                     resultText += "\n" + routeDescription
                 }
+            } else if resultText.contains("API 응답이 이 영역에 표시됩니다.") || resultText.contains("예정 정보가 없습니다.") {
+                resultText = "서울 정류소 노선 정보를 찾을 수 없습니다."
             } else {
-                if resultText.contains("API 응답이 이 영역에 표시됩니다.") || resultText.contains("예정 정보가 없습니다.") {
-                    resultText = "서울 정류소 노선 정보를 찾을 수 없습니다."
-                } else {
-                    resultText += "\n" + resultText
-                }
+                resultText += "\n" + resultText
             }
         }
     }
@@ -390,8 +388,7 @@ final class TestViewModel: ObservableObject {
             throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
         }
         // CityCodeConverter is in BusAPI module, but it should be fine as it has no external dependencies
-        let detectedCityCode = CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
-        return detectedCityCode
+        return CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
     }
 
     private func describeStops(_ stops: [BusStop]) -> String {

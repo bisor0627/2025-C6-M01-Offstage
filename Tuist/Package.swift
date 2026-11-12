@@ -37,7 +37,7 @@ import PackageDescription
     )
 #endif
 
-// 4. 기존 dependencies 정의 (변경 없음)
+/// 4. 기존 dependencies 정의 (변경 없음)
 let package = Package(
     name: "OffStageApp",
     dependencies: [

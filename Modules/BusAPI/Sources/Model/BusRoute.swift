@@ -1,7 +1,9 @@
 import Foundation
 
 public struct BusRoute: Decodable, Hashable, Identifiable {
-    public var id: String { routeId }
+    public var id: String {
+        routeId
+    }
 
     public let routeId: String
     public let routeNumber: String

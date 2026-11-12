@@ -3,13 +3,13 @@ import CoreHaptics
 class HapticManager {
     // MARK: - Properties
 
-    // 싱글톤 객체
+    /// 싱글톤 객체
     static let shared = HapticManager()
 
-    // 핵심 햅틱 엔진
+    /// 핵심 햅틱 엔진
     var hapticEngine: CHHapticEngine?
 
-    // 엔진 실행 상태 추적
+    /// 엔진 실행 상태 추적
     private var isEngineRunning: Bool = false
 
     // MARK: - init
@@ -71,7 +71,7 @@ class HapticManager {
         }
     }
 
-    // private 헬퍼 - 엔진 시작 로직 통합
+    /// private 헬퍼 - 엔진 시작 로직 통합
     private func startEngineIfNeeded() -> Bool {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
             print("이 기기는 햅틱을 지원하지 않습니다")
@@ -121,7 +121,7 @@ class HapticManager {
         }
     }
 
-    // 단일 햅틱 재생
+    /// 단일 햅틱 재생
     func playHaptic(intensity: Float, sharpness: Float, relativeTime: Double = 0, duration: Double) {
         let event = makeHaptic(
             intensity: intensity,
@@ -132,7 +132,7 @@ class HapticManager {
         playHapticPattern(hapticEvents: [event])
     }
 
-    // 패턴 햅틱 재생 (통합 버전)
+    /// 패턴 햅틱 재생 (통합 버전)
     func playHapticPattern(hapticEvents: [CHHapticEvent]) {
         // 메인 스레드에서 실행 보장
         guard Thread.isMainThread else {
@@ -155,7 +155,7 @@ class HapticManager {
 
     // MARK: - Helpers
 
-    // public으로 변경 - 외부에서 이벤트 생성 가능하게
+    /// public으로 변경 - 외부에서 이벤트 생성 가능하게
     func makeHaptic(intensity: Float, sharpness: Float, relativeTime: Double = 0, duration: Double) -> CHHapticEvent {
         let intensityParam = CHHapticEventParameter(parameterID: .hapticIntensity, value: intensity)
         let sharpnessParam = CHHapticEventParameter(parameterID: .hapticSharpness, value: sharpness)

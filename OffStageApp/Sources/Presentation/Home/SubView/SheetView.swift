@@ -62,7 +62,6 @@ struct SheetView: View {
 
     // MARK: - Listening Content
 
-    @ViewBuilder
     private func listeningContent() -> some View {
         VStack {
             Text(L10n.Home.Stt.listening)

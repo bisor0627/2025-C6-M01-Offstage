@@ -10,7 +10,7 @@ struct QuickCameraView: View {
     @EnvironmentObject var router: Router<AppRoute>
     @State var showHelpSheet: Bool = false
 
-    // init
+    /// init
     init(routeNo: String) {
         _vm = StateObject(wrappedValue: QuickCameraViewModel(routeNo: routeNo))
         routeNumber = routeNo

@@ -62,12 +62,11 @@ final class MVPTestViewModel: ObservableObject {
 
         do {
             let cityCodeString = try await detectCityCode(from: CLLocationCoordinate2D(latitude: lat, longitude: lon))
-            let stops = try await busRepository.fetchStopsNearby(
+            return try await busRepository.fetchStopsNearby(
                 latitude: lat,
                 longitude: lon,
                 cityCode: cityCodeString
             )
-            return stops
         } catch {
             handle(error: error, for: "Fetch Nearby Stops")
             return nil
@@ -220,8 +219,7 @@ final class MVPTestViewModel: ObservableObject {
         guard let placemark = try await locationProvider.fetchPlacemark(from: gps) else {
             throw BusAPIError.unknown("Failed to fetch placemark for city code detection.")
         }
-        let detectedCityCode = CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
-        return detectedCityCode
+        return CityCodeConverter.findCode(from: placemark) ?? "31020" // Default to Seongnam
     }
 
     private func describeArrivals(_ arrivals: [BusArrival]) -> String {

@@ -4,7 +4,9 @@ import SwiftUI
 enum TestProfile: String, CaseIterable, Identifiable {
     case seoul = "Seoul"
     case nonSeoul = "Pangyo"
-    var id: Self { self }
+    var id: Self {
+        self
+    }
 }
 
 struct TestView: View {
@@ -81,7 +83,6 @@ struct TestView: View {
         }
     }
 
-    @ViewBuilder
     private var parameterSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             textFieldRow(title: "City Code", text: $viewModel.cityCode)
@@ -95,7 +96,6 @@ struct TestView: View {
         .cardStyle()
     }
 
-    @ViewBuilder
     private func textFieldRow(title: String, text: Binding<String>) -> some View {
         HStack {
             Text(title).frame(width: 80, alignment: .leading)
@@ -148,7 +148,6 @@ struct TestView: View {
         .cardStyle()
     }
 
-    @ViewBuilder
     private func actionGroup(title: LocalizedStringKey, actions: [APIAction]) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
@@ -162,7 +161,6 @@ struct TestView: View {
         }
     }
 
-    @ViewBuilder
     private func apiButton(for action: APIAction) -> some View {
         Button {
             viewModel.resetApiDisplay()

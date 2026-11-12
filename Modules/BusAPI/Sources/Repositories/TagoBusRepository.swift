@@ -26,7 +26,7 @@ public final class TagoBusRepository: BusRepository {
         )
     }
 
-    // 현재 선택된 도시 코드를 저장하는 프로퍼티
+    /// 현재 선택된 도시 코드를 저장하는 프로퍼티
     private var currentCityCode: Int?
 
     public func searchStops(cityCode: String?, nodeName: String?, nodeNumber: String?) async throws -> [BusStop] {
