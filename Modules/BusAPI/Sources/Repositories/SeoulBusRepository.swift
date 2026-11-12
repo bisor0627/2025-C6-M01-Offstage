@@ -11,8 +11,12 @@ public final class SeoulBusRepository: BusRepository {
         if let provider {
             self.provider = provider
         } else {
-            // NetworkLoggerPlugin을 추가하여 API 요청 및 응답을 로깅합니다.
-            self.provider = MoyaProvider<SeoulBusAPITarget>(plugins: [NetworkLoggerPlugin()])
+            // 디버그 빌드에서만 NetworkLoggerPlugin으로 요청·응답 전체를 로깅합니다.
+            #if DEBUG
+                self.provider = MoyaProvider<SeoulBusAPITarget>(plugins: [NetworkLoggerPlugin()])
+            #else
+                self.provider = MoyaProvider<SeoulBusAPITarget>()
+            #endif
         }
         self.decoder = decoder
     }
@@ -111,7 +115,7 @@ public final class SeoulBusRepository: BusRepository {
     }
 
     public func searchRoutes(cityCode _: String, routeNumber: String) async throws -> [BusRoute] {
-        let response = try await request(.getRouteInfo(routeId: routeNumber))
+        let response = try await request(.searchRoutes(routeNumber: routeNumber))
         let body = try decoder.decode(SeoulRouteInfoResponse.self, from: response.data)
         return body.msgBody.itemList.map { dto in
             BusRoute(

@@ -10,8 +10,10 @@ public enum SeoulBusAPITarget {
     case getStationByPos(tmX: Double, tmY: Double)
     /// 3. 정류소 상세 (도착 정보) (getStationByUid)
     case getStationArrivals(arsId: String) // arsId = 정류소 번호 (nodeNo)
-    /// 4. 노선 정보 (방향) (getBusRouteList)
+    /// 4. 노선 기본 정보 (getRouteInfo) - busRouteId로 조회
     case getRouteInfo(routeId: String)
+    /// 4-1. 노선 번호 검색 (getBusRouteList) - strSrch로 조회. busRouteId는 무시되고 전체 노선이 옵니다.
+    case searchRoutes(routeNumber: String)
     /// 5. 정류소 경유 노선 목록 (getRouteByStation)
     case getRouteByStation(arsId: String)
     /// 6. 노선별 경유 정류소 목록 (getStaionByRoute)
@@ -33,7 +35,8 @@ extension SeoulBusAPITarget: TargetType {
         case .getStationByName: "/stationinfo/getStationByName"
         case .getStationByPos: "/stationinfo/getStationByPos"
         case .getStationArrivals: "/stationinfo/getStationByUid"
-        case .getRouteInfo: "/busRouteInfo/getBusRouteList"
+        case .getRouteInfo: "/busRouteInfo/getRouteInfo"
+        case .searchRoutes: "/busRouteInfo/getBusRouteList"
         case .getRouteByStation: "/stationinfo/getRouteByStation"
         case .getStaionByRoute: "/busRouteInfo/getStaionByRoute"
         case .getArrInfoByRoute: "/arrive/getArrInfoByRoute"
@@ -63,7 +66,9 @@ extension SeoulBusAPITarget: TargetType {
         case let .getStationArrivals(arsId):
             params["arsId"] = arsId //
         case let .getRouteInfo(routeId):
-            params["busRouteId"] = routeId //
+            params["busRouteId"] = routeId
+        case let .searchRoutes(routeNumber):
+            params["strSrch"] = routeNumber
         case let .getRouteByStation(arsId):
             params["arsId"] = arsId
         case let .getStaionByRoute(busRouteId):

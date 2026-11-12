@@ -119,14 +119,19 @@ public final class TagoBusRepository: BusRepository {
             throw BusAPIError.emptyBody
         }
 
-        if let body = String(data: response.data, encoding: .utf8) {
-            logger.info("⬅️ Response: \(target.path) status: \(response.statusCode)\n\(body)")
-        } else {
-            logger
-                .info(
-                    "⬅️ Response: \(target.path) status: \(response.statusCode) (non-UTF8 body, \(response.data.count) bytes)"
-                )
-        }
+        // Bodies only in debug builds: arrivals are polled every few seconds.
+        #if DEBUG
+            if let body = String(data: response.data, encoding: .utf8) {
+                logger.info("⬅️ Response: \(target.path) status: \(response.statusCode)\n\(body)")
+            } else {
+                logger
+                    .info(
+                        "⬅️ Response: \(target.path) status: \(response.statusCode) (non-UTF8 body, \(response.data.count) bytes)"
+                    )
+            }
+        #else
+            logger.info("⬅️ Response: \(target.path) status: \(response.statusCode) (\(response.data.count) bytes)")
+        #endif
 
         let envelope: BusAPIEnvelope<Item>
         do {
